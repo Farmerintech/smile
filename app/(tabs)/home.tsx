@@ -1,6 +1,8 @@
+import { CartModal } from "@/components/cartModal";
 import { data } from "@/components/data";
 import { SearchInput } from "@/components/form/formInput";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
   FlatList,
   Image,
@@ -22,22 +24,30 @@ const items = [
   "More",
 ];
 const Home = () => {
+ const [isModalVisible, setModalVisible] = useState(false);
+  const [img, setImg] = useState()
+  const [price, setPrice] = useState<number>()
+  const  handleModalOpen = (item:any, price:number,) =>{
+    setImg(item);
+    setModalVisible(true)
+    setPrice(price)
+  }
   return (
+    <>
     <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar barStyle="dark-content" backgroundColor={"white"} />
+      <StatusBar barStyle="dark-content" backgroundColor={"#093131"} />
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingTop: 10, paddingBottom: 200 }}
       >
-        <View className="py-2 bg-white" style={{ paddingHorizontal: 16 }}>
-          <View className="w-full rounded-[12px] h-[72px] px-[12px] font-[600] bg-[#095C47]"></View>
+        <View className="py-2 bg-[#093131]" style={{ paddingHorizontal: 16 }}>
+          <View className="w-full rounded-[12px] h-[72px] px-[12px] font-[600] bg-[#093131]"></View>
           <View className="py-4">
             <SearchInput
               name=""
               placeHolder=""
               action={() => {}}
-              label=""
               value=""
               error=""
               icon={""}
@@ -84,7 +94,7 @@ const Home = () => {
                     className="rounded-[12px] mb-10"
                   />
                 </View>
-                <TouchableOpacity onPress={() => {}}>
+                <TouchableOpacity onPress={() => {handleModalOpen(item.imageUrl, item.price)}}>
                   <View className="flex flex-row justify-between">
                     <Text className="text-[16px]">{item.name}</Text>
                     <MaterialIcons name="favorite-outline" size={20} />
@@ -168,6 +178,13 @@ const Home = () => {
         </View>
       </ScrollView>
     </SafeAreaView>
+     <CartModal
+          visible={isModalVisible}
+          onRequestClose={() => setModalVisible(false)}
+          source={img}
+          price={price || 0}
+        />
+        </>
   );
 };
 

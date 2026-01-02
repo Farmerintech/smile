@@ -1477,23 +1477,19 @@ export const countries = [
   }
 ]
 
-
-
-export function countryCodeToEmoji(code:string) {
+// utils/country.ts
+export function countryCodeToEmoji(code: string) {
+  if (!code) return "";
   return code
     .toUpperCase()
-    .replace(/./g, (char) =>
-      String.fromCodePoint(char.charCodeAt(0) + 127397)
-    );
-
+    .replace(/./g, (char) => String.fromCodePoint(char.charCodeAt(0) + 127397));
 }
 
 
-
-// @/components/countries.tsx
+// CountrySelectWithInput.tsx
 import { InputFields } from "@/components/form/formInput";
-import { Entypo } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import { Entypo, Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
 import {
   FlatList,
   Modal,
@@ -1504,21 +1500,7 @@ import {
   View,
 } from "react-native";
 
-type Props = {
-  value: string;
-  onChange: (text: string) => void;
-  error?: string;
-  label?: string;
-  icon?: string;
-};
-
-const CountrySelectWithInput: React.FC<Props> = ({
-  value,
-  onChange,
-  error,
-  label = "Phone Number",
-  icon = "phone",
-}) => {
+const CountrySelectWithInput = ({ value, onChange, error, label = "Phone Number", icon = "phone" }: any) => {
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -1527,7 +1509,7 @@ const CountrySelectWithInput: React.FC<Props> = ({
     setSelectedCountry(country);
     setModalVisible(false);
     if (!value.startsWith(country.dial_code)) {
-      onChange(`${country.dial_code}`);
+      // onChange(`${country.dial_code} `);
     }
   };
 
@@ -1535,129 +1517,104 @@ const CountrySelectWithInput: React.FC<Props> = ({
     c.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const countryCodeToEmoji = (code: string) =>
-    code
-      .toUpperCase()
-      .replace(/./g, (char) =>
-        String.fromCodePoint(char.charCodeAt(0) + 127397)
-      );
-const handlePhoneChange = (text: string) => {
-  const dialCodeWithSpace = `${selectedCountry.dial_code} `;
-
-  // If user deleted dial code, re-add it
-  if (!text.startsWith(dialCodeWithSpace)) {
-    const cleaned = text.replace(/^\+?\d*\s*/, ''); // remove any prefix
-    onChange(dialCodeWithSpace + cleaned);
-  } else {
+  const handlePhoneChange = (text: string) => {
     onChange(text);
-  }
-};
-useEffect(() => {
-  if (!value?.startsWith(`${selectedCountry.dial_code} `)) {
-    onChange(`${selectedCountry.dial_code} `);
-  }
-}, [selectedCountry]);
+  };
+
+  // useEffect(() => {
+  //   if (!value?.startsWith(`${selectedCountry.dial_code} `)) {
+  //     onChange(`${selectedCountry.dial_code} `);
+  //   }
+  // }, [selectedCountry]);
 
   return (
-<View className="flex-row items-start gap-2 w-full">
-  {/* Country Selector with Label */}
-  <View className="w-[60px]">
-    <Text className="text-[16px] font-[600] text-gray-800 mb-2">Country</Text>
-    <TouchableOpacity
-      className="bg-[#E9EAEB] p-3 min-h-[14px] rounded-[6px] border border-gray-200 flex-row items-center justify-between"
-      style={styles.placeholder}
-      onPress={() => setModalVisible(true)}
-    >
-      <Text className="text-[20px] mr-1">
-        {countryCodeToEmoji(selectedCountry.code)}
-      </Text>
-      <Entypo name="chevron-down" size={16} color="gray" />
-    </TouchableOpacity>
-  </View>
+    <View className="flex-row items-start gap-2 w-full">
+      {/* Country Code + Phone Input */}
+      <View className="flex-row items-center space-x-2 w-full">
+        {/* Country Picker - 40% width */}
+        <View className="w-[35%]">
+          <TouchableOpacity
+            className="px-4 py-6 rounded-full border border-gray-200 flex-row items-center justify-between"
+            onPress={() => setModalVisible(true)}
+          >
+            <Text className="text-[20px]">
+              {countryCodeToEmoji(selectedCountry.code)} {selectedCountry.dial_code}
+            </Text>
+            <Entypo name="chevron-down" size={16} color="gray" />
+          </TouchableOpacity>
+        </View>
 
-  {/* Phone Number Input Field with Label */}
-  <View className="flex-1">
-    <InputFields
-      label="Phone Number"
-      placeHolder=""
-      value={value}
-      action={handlePhoneChange}
-      name="Phone Number"
-      error={error || ""}
-      icon={icon}
-    />
-  </View>
+        {/* Phone Number Input Field - 60% width */}
+        <View className="w-[60%]">
+          <InputFields
+            label=""
+            placeHolder="Phone number"
+            value={value}
+            action={handlePhoneChange}
+            name="Phone Number"
+            error={error || ""}
+            icon={icon}
+          />
+        </View>
+      </View>
 
-  {/* Country Modal */}
-  <Modal
-    visible={isModalVisible}
-    transparent
-    animationType="fade"
-    onRequestClose={() => setModalVisible(false)}
-  >
-    <TouchableOpacity
-      activeOpacity={1}
-      style={styles.modalOverlay}
-      onPress={() => setModalVisible(false)}
-    >
-      <TouchableOpacity
-        activeOpacity={1}
-        style={styles.bottomSheetContainer}
-        onPress={() => {}}
-      >
-        <TextInput
-          placeholder="Search country..."
-          style={styles.searchInput}
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-        />
-        <FlatList
-          data={filteredCountries}
-          keyExtractor={(item) => item.code}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.countryItem}
-              onPress={() => handleSelect(item)}
-            >
-              <Text style={styles.countryText}>
-                {countryCodeToEmoji(item.code)} {item.name} ({item.dial_code})
-              </Text>
+      {/* Country Modal */}
+      <Modal visible={isModalVisible} transparent animationType="fade" 
+      onRequestClose={() => setModalVisible(false)}>
+    
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} 
+        onPress={() => setModalVisible(false)}>
+          
+          <TouchableOpacity style={styles.bottomSheetContainer} activeOpacity={1}>
+                <View className="flex flex-row items-center justify-start gap-8 mb-10">
+          <Ionicons name="arrow-back" size={25}/>
+          <Text className="text-[20px]">Select a Country</Text>
+        </View>
+            <TextInput
+              placeholder="Search for a country..."
+              style={styles.searchInput}
+              value={searchTerm}
+              className="rounded-full"
+              onChangeText={setSearchTerm}
+            />
+            <FlatList
+              data={filteredCountries}
+              keyExtractor={(item) => item.code}
+              renderItem={({ item }) => (
+                <TouchableOpacity style={styles.countryItem} onPress={() => handleSelect(item)}>
+                  <Text style={styles.countryText}>
+                    {countryCodeToEmoji(item.code)} {item.name} ({item.dial_code})
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeBtn}>
+              <Text style={styles.closeText}>Close</Text>
             </TouchableOpacity>
-          )}
-        />
-        <TouchableOpacity
-          onPress={() => setModalVisible(false)}
-          style={styles.closeBtn}
-          className="bg-[#FF6347] py-[12px] rounded-[25px] text-white"
-        >
-          <Text style={styles.closeText}>Close</Text>
+          </TouchableOpacity>
         </TouchableOpacity>
-      </TouchableOpacity>
-    </TouchableOpacity>
-  </Modal>
-</View>
+      </Modal>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  placeholder: {
-    borderColor: "#ccc",
-    borderRadius: 6,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  modalContent: {
+  modalOverlay: {
     flex: 1,
-    padding: 16,
-    width: 300,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end",
+  },
+  bottomSheetContainer: {
+    height: "100%",
     backgroundColor: "#fff",
+    padding: 20,
   },
   searchInput: {
-    padding: 10,
+    padding: 15,
     borderColor: "#aaa",
-    borderWidth: 1,
+    borderWidth: 3,
     marginBottom: 12,
-    borderRadius: 6,
+    borderRadius: 15,
   },
   countryItem: {
     paddingVertical: 12,
@@ -1670,25 +1627,14 @@ const styles = StyleSheet.create({
   closeBtn: {
     marginTop: 20,
     alignItems: "center",
+    backgroundColor: "#093131",
+    paddingVertical: 12,
+    borderRadius: 25,
   },
   closeText: {
     color: "white",
     fontSize: 16,
   },
-  modalOverlay: {
-  flex: 1,
-  backgroundColor: "rgba(0,0,0,0.4)",
-  justifyContent: "flex-end",
-},
-
-bottomSheetContainer: {
-  height: "50%", // 2/3 of screen height
-  backgroundColor: "#fff",
-  borderTopLeftRadius:25,
-  borderTopRightRadius: 25,
-  padding: 20,
-},
-
 });
 
 export default CountrySelectWithInput;

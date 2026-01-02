@@ -22,9 +22,7 @@ const SignIn: React.FC = () => {
 
   const handleFormChange = (key: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
-    if (error[key]) {
-      setError((prev) => ({ ...prev, [key]: "" })); // Clear error on input change
-    }
+    if (error[key]) setError((prev) => ({ ...prev, [key]: "" }));
   };
 
   const validate = (): boolean => {
@@ -47,7 +45,6 @@ const SignIn: React.FC = () => {
     if (!validate()) return;
 
     setLoading(true);
-
     try {
       const response = await fetch("your-api-url", {
         method: "POST",
@@ -56,12 +53,10 @@ const SignIn: React.FC = () => {
       });
 
       if (!response.ok) {
-        // Handle non-200 responses here
         const errorData = await response.json();
         console.error("Login failed:", errorData.message || response.statusText);
-        // Optionally show user feedback
       } else {
-        // Handle success (navigate, show message, etc.)
+        // Handle success
       }
     } catch (error) {
       console.error("Network or server error:", error);
@@ -71,56 +66,88 @@ const SignIn: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFF", paddingTop:80  }}>
-      <StatusBar barStyle="dark-content" />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 200 }}
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#093131" }}>
+      <StatusBar barStyle="light-content" />
+
+      {/* Top 25% */}
+      <View style={{ flex: 1, justifyContent: "flex-end", paddingHorizontal: 24}}>
+        <Text className="text-[48px] font-bold text-white text-center mb-2">
+          Smile
+        </Text>
+        <Text className="text-[#CFEDEA] text-center text-[14px]">
+        </Text>
+      </View>
+
+      {/* Bottom 75% Modal */}
+      <View
+        style={{
+          flex: 3,
+          backgroundColor: "#FFF",
+          borderTopLeftRadius: 32,
+          borderTopRightRadius: 32,
+          paddingHorizontal: 24,
+          paddingTop: 32,
+        }}
       >
-        <View style={{ marginBottom: 24 }}>
-          <Text className="text-[32px] font-bold text-center mb-2">
-            Let's get you started
-          </Text>
-          <Text className="text-center text-gray-600">
-            Please enter your phone number to login
-          </Text>
-        </View>
-
-        <View className="flex flex-col gap-[12px] w-full">
-          <CountrySelectWithInput
-              value={formData.phoneNumber}
-              onChange={(text) => handleFormChange("phoneNumber", text)}
-               error={error.phoneNumber}
-            />
-          {/* <InputFields
-            label="Phone Number"
-            placeHolder="Enter your phone number"
-            value={formData.phoneNumber}
-            action={(text) => handleFormChange("phoneNumber", text)}
-            name="phoneNumber"
-            error={error?.phoneNumber || ''}
-            icon="phone"
-          />
- */}
-          <TouchableOpacity
-            className={`w-full py-[12px] rounded-[8px] mt-2 ${loading ? "bg-gray-400" : "bg-[#FF6347]"}`}
-            onPress={handleSubmit}
-            disabled={loading}
-          >
-            <Text className="text-white text-center font-semibold text-base">
-              {loading ? "Loading..." : "Continue"}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={{ flex: 1, justifyContent: "flex-end", paddingHorizontal: 24 }}>
+            <Text className="text-[30px] font-bold text-center mb-2">
+              Welcome
             </Text>
-          </TouchableOpacity>
+            <Text className=" text-center text-[16px]">
+              Let's get you started with phone number
+            </Text>
+          </View>
+          <View className="flex flex-col gap-4 mt-4">
+            {/* Phone Input */}
+            <CountrySelectWithInput
+              value={formData.phoneNumber}
+              onChange={(text: any) => handleFormChange("phoneNumber", text)}
+              error={error.phoneNumber}
+            />
 
-         <View className="flex flex-row items-center gap-2 justify-center">
-            <Text className="text-center text-sm text-gray-500">
-             Never had smile account..?
-             </Text>
-            <Link href='/home' className="underline text-[#FF6347]">Register</Link>
+
+
+            {/* Continue Button */}
+            <View className="flex flex-row items-center justify-center gap-4">
+              {/* SMS Button */}
+              <TouchableOpacity
+                className={`flex-1 py-4 rounded-full border border-gray-400`}
+                onPress={handleSubmit}
+                disabled={loading} // disable while loading
+              >
+                <Text className="text-black text-center font-semibold text-base">
+                  {loading ? "Loading..." : "SMS"}
+                </Text>
+              </TouchableOpacity>
+
+              {/* WhatsApp Button */}
+              <TouchableOpacity
+                className={`flex-1 py-4 rounded-full ${loading ? "bg-gray-400" : "bg-[#093131]"}`}
+                onPress={handleSubmit}
+                disabled={loading} // disable while loading
+              >
+                <Text className="text-white text-center font-semibold text-base">
+                  {loading ? "Loading..." : "WhatsApp"}
+                </Text>
+              </TouchableOpacity>
             </View>
-        </View>
-      </ScrollView>
+
+            {/* Register Link */}
+            <View className="flex flex-row items-center justify-center gap-2 mt-4">
+              <Text className="text-gray-500 text-sm">
+                Never had a Smile account?
+              </Text>
+              <Link href="/home" className="underline text-[#1EBA8D] text-sm">
+                Register
+              </Link>
+            </View>
+          </View>
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };

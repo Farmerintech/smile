@@ -22,9 +22,7 @@ const options={headerShown: false, headerShadowVisible:false }
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="index" options={options} />
-        <Stack.Screen name="rider" options={options}/>
-        <Stack.Screen name="vendor" options={options}/>
-        <Stack.Screen name="user" options={options}/>
+        <Stack.Screen name="app" options={options}/>
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

@@ -25,18 +25,7 @@ export const ProgressBar = ({ index, mylink, value }: progressBarProps) => {
               index === 2 ? styles.activeDot : styles.inactiveDot,
             ]}
           />
-          <View
-            style={[
-              styles.progressDot,
-              index === 3 ? styles.activeDot : styles.inactiveDot,
-            ]}
-          />
-          <View
-            style={[
-              styles.progressDot,
-              index === 4 ? styles.activeDot : styles.inactiveDot,
-            ]}
-          />
+         
         </View>
 
         <Text style={styles.skipText}>Skip</Text>
@@ -55,7 +44,7 @@ const ProgressIndicator = ({ realvalue }: any) => {
         radius={50}
         value={realvalue}
         inActiveStrokeColor={"gray"}
-        activeStrokeColor={"#f97316"}
+        activeStrokeColor={"#1EBA8D"}
         inActiveStrokeOpacity={0.2}
         inActiveStrokeWidth={6}
         duration={2000}
@@ -76,7 +65,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   skipText: {
-    color: "#f97316",
+    color: "#1EBA8D",
     marginTop: 5,
     fontSize: 28,
     fontWeight: "bold",
@@ -92,10 +81,10 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: "#f97316",
+    borderColor: "#1EBA8D/20",
   },
   activeDot: {
-    backgroundColor: "#f97316",
+    backgroundColor: "#1EBA8D",
     width: 30, // Larger width for active dot
   },
   inactiveDot: {
@@ -107,8 +96,8 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: "#f97316",
-    borderColor: "#f97316",
+    backgroundColor: "#1EBA8D",
+    borderColor: "#1EBA8D",
     position: "absolute",
     left: 20,
     top: 20,
@@ -120,7 +109,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#f97316",
+    backgroundColor: "#1EBA8D",
   },
   container2: {
     flex: 1,

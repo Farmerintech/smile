@@ -1,6 +1,4 @@
 import CountrySelectWithInput from "@/components/countries";
-import { FormDatePicker } from "@/components/form/datePicker";
-import { InputFields } from "@/components/form/formInput";
 import { Link } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -13,206 +11,143 @@ import {
 } from "react-native";
 import "../../global.css";
 
-const SignUp: React.FC = () => {
-  interface formDataTypes {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phoneNumber: string;
-    password: string;
-    confirmPSW: string;
-    gender: string;
-    dateOfBirth: Date | null;
-  }
-interface errorTypes {
-      firstName: string;
-    lastName: string;
-    email: string;
-    phoneNumber: string;
-    password: string;
-    confirmPSW: string;
-    gender: string;
-    dateOfBirth: string
+interface FormData {
+  phoneNumber: string;
 }
-  const [formData, setFormdata] = useState<formDataTypes>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    password: "",
-    confirmPSW: "",
-    gender: "",
-    dateOfBirth: null,
-  });
 
-  const [error, setError] = useState<errorTypes>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    password: "",
-    confirmPSW: "",
-    gender: "",
-    dateOfBirth: "",
-  } as any);
+const SignUp: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>({ phoneNumber: "" });
+  const [error, setError] = useState<Partial<FormData>>({});
+  const [loading, setLoading] = useState(false);
 
-  const [loading, setLoading] = useState<boolean>();
+  const handleFormChange = (key: keyof FormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
+    if (error[key]) setError((prev) => ({ ...prev, [key]: "" }));
+  };
 
-  const handleForm = (key: keyof formDataTypes, value: any) => {
-    setFormdata((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
+  const validate = (): boolean => {
+    let valid = true;
+    const newErrors: Partial<FormData> = {};
+
+    if (!formData.phoneNumber.trim()) {
+      newErrors.phoneNumber = "Phone number is required.";
+      valid = false;
+    } else if (!/^\d+$/.test(formData.phoneNumber)) {
+      newErrors.phoneNumber = "Phone number must contain only digits.";
+      valid = false;
+    }
+
+    setError(newErrors);
+    return valid;
   };
 
   const handleSubmit = async () => {
+    if (!validate()) return;
+
     setLoading(true);
-    Object.keys(formData).forEach((key) => {
-      const k = key as keyof formDataTypes;
-      if (!formData[k]) {
-        setError((prev) => ({
-          ...prev,
-          [k]: `${k} should not be empty`,
-        }));
-        setLoading(false);
-      } else {
-        setError((prev) => ({ ...prev, [k]: "" }));
-      }
-    });
-
-    if (!/^\d+$/.test(formData.phoneNumber)) {
-      setError((prev) => ({
-        ...prev,
-        phoneNumber: "Only numbers allowed",
-      }));
-      setLoading(false);
-    }
-
-    if (formData.password.length < 8) {
-      setError((prev) => ({
-        ...prev,
-        password: "Password must be at least 8 characters",
-      }));
-      setLoading(false);
-    }
-
-    if (formData.password !== formData.confirmPSW) {
-      setError((prev) => ({
-        ...prev,
-        password: "Passwords do not match",
-        confirmPSW: "Passwords do not match",
-      }));
-      setLoading(false);
-    }
-
     try {
-      const res = await fetch("url", {
+      const response = await fetch("your-api-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      if (!res.ok) {
-        // handle error
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Login failed:", errorData.message || response.statusText);
+      } else {
+        // Handle success
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error("Network or server error:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFF", paddingTop: 80 }}>
-      <StatusBar barStyle="dark-content" />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 20,
-          paddingBottom: 200,
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#093131" }}>
+      <StatusBar barStyle="light-content" />
+
+      {/* Top 25% */}
+      <View style={{ flex: 1, justifyContent: "flex-end", paddingHorizontal: 24 }}>
+        <Text className="text-[48px] font-bold text-white text-center mb-2">
+          Smile
+        </Text>
+        <Text className="text-[#CFEDEA] text-center text-[14px]">
+        </Text>
+      </View>
+
+      {/* Bottom 75% Modal */}
+      <View
+        style={{
+          flex: 3,
+          backgroundColor: "#FFF",
+          borderTopLeftRadius: 32,
+          borderTopRightRadius: 32,
+          paddingHorizontal: 24,
+          paddingTop: 32,
         }}
       >
-        <View style={{ marginBottom: 24 }}>
-          <Text className="text-[32px] font-bold text-center mb-2">
-            Let's get you started
-          </Text>
-          <Text className="text-center text-gray-600 text-[16px]">
-            Please fill the form with your details correctly
-          </Text>
-        </View>
-
-        <View className="flex flex-col gap-[12px] w-full">
-          <CountrySelectWithInput
-            value={formData.phoneNumber}
-            onChange={(text) => handleForm("phoneNumber", text)}
-            error={error.phoneNumber}
-          />
-          <InputFields
-            label="Email"
-            placeHolder=""
-            value={formData?.email}
-            action={(text) => handleForm("email", text)}
-            name="Email"
-            error={error?.email}
-            icon="email"
-          />
-          <View className="flex-row gap-[12px] w-full">
-            <View className="flex-1">
-              <InputFields
-                label="First Name"
-                placeHolder=""
-                value={formData?.firstName}
-                action={(text) => handleForm("firstName", text)}
-                name="First Name"
-                error={error?.firstName}
-                icon="account"
-              />
-            </View>
-            <View className="flex-1">
-              <InputFields
-                label="Last Name"
-                placeHolder=""
-                value={formData?.lastName}
-                action={(text) => handleForm("lastName", text)}
-                name="Last Name"
-                error={error?.lastName}
-                icon="account"
-              />
-            </View>
-          </View>
-
-          <View className="flex-row gap-[12px] w-full">
-            <View className="flex-1">
-              <FormDatePicker
-                label="Date of Birth"
-                icon="calendar"
-                error={error?.dateOfBirth || ""}
-                value={formData.dateOfBirth}
-                onChange={(date: Date) => handleForm("dateOfBirth", date)}
-              />
-            </View>
-          </View>
-
-          <Text className="text-center text-sm text-gray-500 mt-4 text-sm">
-            By signing up you agree to our terms of use and services
-          </Text>
-          <TouchableOpacity
-            className="w-full bg-[#FF6347] py-[12px] rounded-[8px] mt-2 "
-            onPress={handleSubmit}
-          >
-            <Text className="text-white text-center font-semibold text-base">
-              Continue
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={{ flex: 1, justifyContent: "flex-end", paddingHorizontal: 24 }}>
+            <Text className="text-[30px] font-bold text-center mb-2">
+              Welcome
             </Text>
-          </TouchableOpacity>
-          <View className="flex flex-row items-center gap-2 justify-center">
-            <Text className="text-center text-sm text-gray-500">
-              Already have an account..?
+            <Text className=" text-center text-[18px]">
+              Let's get you started with phone number
             </Text>
-            <Link href="/signin" className="underline text-[#FF6347]">
-              Login
-            </Link>
           </View>
-        </View>
-      </ScrollView>
+          <View className="flex flex-col gap-4 mt-4">
+            {/* Phone Input */}
+            <CountrySelectWithInput
+              value={formData.phoneNumber}
+              onChange={(text: any) => handleFormChange("phoneNumber", text)}
+              error={error.phoneNumber}
+            />
+
+
+
+            {/* Continue Button */}
+            <View className="flex flex-row items-center justify-center gap-4">
+              {/* SMS Button */}
+              <TouchableOpacity
+                className={`flex-1 py-4 rounded-full border border-gray-400`}
+                onPress={handleSubmit}
+                disabled={loading} // disable while loading
+              >
+                <Text className="text-black text-center font-semibold text-base">
+                  {loading ? "Loading..." : "SMS"}
+                </Text>
+              </TouchableOpacity>
+
+              {/* WhatsApp Button */}
+              <TouchableOpacity
+                className={`flex-1 py-4 rounded-full ${loading ? "bg-gray-400" : "bg-[#093131]"}`}
+                onPress={handleSubmit}
+                disabled={loading} // disable while loading
+              >
+                <Text className="text-white text-center font-semibold text-base">
+                  {loading ? "Loading..." : "WhatsApp"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Register Link */}
+            <View className="flex flex-row items-center justify-center gap-2 mt-4">
+              <Text className="text-gray-500 text-sm">
+                Never had a Smile account?
+              </Text>
+              <Link href="/home" className="underline text-[#1EBA8D] text-sm">
+                Register
+              </Link>
+            </View>
+          </View>
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };

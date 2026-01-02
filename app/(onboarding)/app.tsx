@@ -8,7 +8,7 @@ interface User {
   username: string;
 }
 
-export default function Index() {
+export default function App() {
   const [user, setUser] = useState<User>({ username: '' });
 
   // Retrieve user from AsyncStorage
@@ -57,7 +57,7 @@ const style = StyleSheet.create({
   {/* Asset Placeholder */}
   <View className="w-[120px] h-[120px] rounded-full bg-[#1EBA8D]/20 items-center justify-center mb-[20px]">
     {/* Replace later with Image or SVG */}
-    <Ionicons name="cart-outline" size={62} color="#1EBA8D" />
+    <Ionicons name="cube-outline" size={62} color="#1EBA8D" />
 
 
   </View>
@@ -65,10 +65,12 @@ const style = StyleSheet.create({
   {/* Text Content */}
   <View className="items-center">
     <Text className="text-white text-[26px] font-bold text-center mb-[12px]">
-      Shop Local, Anytime, Fast, Easy Delivery
+                  Delivery Right at Your Door Step
+
     </Text>
     <Text className="text-[#CFEDEA] text-[16px] text-center ">
-      Browse and order from your favorite local stores all in one place.
+                  Enjoy fast, reliable delivery right to your doorstep with just a few taps.
+
       
     </Text>
   
@@ -79,7 +81,7 @@ const style = StyleSheet.create({
 </View>
 
 
-          <ProgressBar index={1} mylink="/app" value={50} />
+          <ProgressBar index={2} mylink="/(auth)/signin" value={100} />
         </SafeAreaView>
       </ScrollView>
     </>
