@@ -5,7 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
 
 export default function RootLayout() {
@@ -29,19 +29,12 @@ const router = useRouter()
     headerTitle: "Account",
     headerLeft: () => (
       <TouchableOpacity  onPress={() => router.back()} style={{ paddingHorizontal: 10 }}>
-        <Ionicons name="chevron-back" size={28} />
+        <MaterialIcons name="chevron-left" size={28} />
       </TouchableOpacity>
     ),
   }}
 /> 
 
-        {/* App Screen */}
-        <Stack.Screen
-          name="app"
-          options={{
-            headerShown: false,
-          }}
-        />
       </Stack>
 
       <StatusBar style="auto" />

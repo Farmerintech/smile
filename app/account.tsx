@@ -6,18 +6,19 @@ const Account: React.FC = () => {
  return (
     <View
       style={{
-        marginTop: 12,
+        marginTop: 8,
         marginBottom:24,
         backgroundColor: "#FFFFFF",
         // borderRadius: 16,
         overflow: "scroll",
       }}
     >
-      <Item icon="receipt-outline" label="Order History" />
-      <Item icon="person-outline" label="Account" />
-      <Item icon="notifications-outline" label="Notifications" />
-      <Item icon="trash-outline" label="Delete my account" danger />
-      <Item icon="log-out-outline" label="Logout" danger />
+      <Item icon="person-outline" label="Yakub" />
+      <Item icon="mail" label="farmerintech@gmail.com" />
+      <Item icon="key" label="Change password" />
+      <Item icon="phone" label="Change number" />
+      <Item icon="wallet" label="Payment methods"  />
+      <Item icon="settings" label="support"  />
     </View>
   );
 };

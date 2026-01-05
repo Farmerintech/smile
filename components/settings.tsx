@@ -69,7 +69,7 @@ const SettingsList = () => {
   const router = useRouter();
 
   const goTo = () =>{
-    router.push("/(screens)/account")
+    router.push("/account")
   }
 
   return (
