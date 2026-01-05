@@ -32,6 +32,7 @@ export async function registerForPushNotificationsAsync() {
     await Notifications.setNotificationChannelAsync("default", {
       name: "default",
       importance: Notifications.AndroidImportance.MAX,
+       sound: "notification.mp3"
     });
   }
 

@@ -110,7 +110,7 @@ const removeItem = async (id: string) => {
 
       {/* ================= CHECKOUT ================= */}
       {!isEmpty && (
-        <View className="absolute bottom-10 left-0 right-0 bg-white p-5 border-t border-gray-200">
+        <View className="absolute bottom-20 left-0 right-0 bg-white p-5 border-t border-gray-200">
           <View className="flex-row justify-between mb-2">
             <AppText>Subtotal</AppText>
             <AppText>₦{subTotal}</AppText>

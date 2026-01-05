@@ -1,6 +1,7 @@
 import { CartModal } from "@/components/cartModal";
 import { data } from "@/components/data";
 import { registerForPushNotificationsAsync } from "@/hooks/notifications";
+import { useStatusBar } from "@/hooks/statusBar";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import * as Notifications from "expo-notifications";
 import { useEffect, useState } from "react";
@@ -56,12 +57,11 @@ const items = [
     bgColor: "#6B7280",
   },
 ]
-
 const Home = () => {
 const { addToCart } = useAppStore();
-
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
+ useStatusBar("white", "dark-content");
 
   const [itemCounts, setItemCounts] = useState<Record<number, number>>({});
 
@@ -124,8 +124,9 @@ const { addToCart } = useAppStore();
   async function sendTestNotification() {
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: "Order Update 🍔",
-      body: "Your food is on the way!",
+      title: `Cart Updated`,
+      body: `${selectedItem.name} added to cart- ${itemCounts[selectedItem.storeId]}`,
+      sound: "notification.mp3"
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
@@ -145,6 +146,7 @@ const { addToCart } = useAppStore();
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingTop: 0, paddingBottom: 100 }}
         >
+          <StatusBar backgroundColor={"white"} barStyle={"dark-content"}/>
           <View className="w-full p-4 ">
             <View
               className="flex-row items-center shadow rounded-[20px] px-4 py-3 mb-4"
@@ -418,7 +420,6 @@ const { addToCart } = useAppStore();
                 </View>
               </TouchableOpacity>
             ))}
-<StatusBar barStyle={"dark-content"} backgroundColor={"white"}/>
           </View>
 
         </ScrollView>

@@ -3,11 +3,11 @@ import SettingsList from "@/components/settings";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 
+import { useStatusBar } from "@/hooks/statusBar";
 import {
   Image,
   SafeAreaView,
   ScrollView,
-  StatusBar,
   Text,
   TouchableOpacity,
   View
@@ -68,13 +68,12 @@ const SignIn: React.FC = () => {
     }
   };
 
-  return (
+ useStatusBar("#093131", "light-content");  return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#093131", paddingTop:10 }}>
 
 
       {/* Top 25% */}
       <View style={{ flex: 0.5, justifyContent: "flex-start", alignItems:"center", paddingHorizontal: 24}}>
-        <StatusBar barStyle={"light-content"} backgroundColor={"#093131"}/>
         
         <View className="bg-[#FF6B35] w-[80px] h-[40px] flex justify-center absolute right-10 mt-5 flex-row items-center px-5 rounded-full">
           <AppTextBold className="text-[20px] font-bold text-white text-center mb-2 ">

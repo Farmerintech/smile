@@ -50,11 +50,11 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/notification-icon.png",
-          "color": "#ffffff",
+          "icon": "./assets/images/yakub.jpg",
+          "color": "#093131",
           "defaultChannel": "default",
           "sounds": [
-            "./assets/sounds/notification.wav"
+            "./assets/sounds/notification.mp3"
           ],
           "enableBackgroundRemoteNotifications": false
         }
