@@ -1,10 +1,12 @@
-import * as Location from 'expo-location';
-import { create } from 'zustand';
+import * as Location from "expo-location";
+import { create } from "zustand";
 import {
-    getSecureItem,
-    removeSecureItem,
-    setSecureItem,
-} from '../lib/secureStorage';
+  getSecureItem,
+  removeSecureItem,
+  setSecureItem,
+} from "../lib/secureStorage";
+
+/* ================= TYPES ================= */
 
 type Product = {
   id: string;
@@ -13,10 +15,13 @@ type Product = {
   image?: string;
 };
 
+export type CartItem = Product & {
+  quantity: number;
+};
+
 type LocationType = {
   latitude: number;
   longitude: number;
-  address?: string;
 };
 
 type User = {
@@ -30,26 +35,31 @@ type User = {
 
 type AppState = {
   user: User;
-  cart: Product[];
+  cart: CartItem[];
   wishlist: Product[];
   location: LocationType | null;
   loading: boolean;
 
   hydrate: () => Promise<void>;
   setUser: (user: User) => Promise<void>;
-  setCart: (cart: Product[]) => Promise<void>;
+  addToCart: (item: CartItem) => Promise<void>;
+  removeFromCart: (id: string) => Promise<void>;
   setWishlist: (wishlist: Product[]) => Promise<void>;
   refreshLocation: () => Promise<void>;
   logout: () => Promise<void>;
 };
 
+/* ================= DEFAULTS ================= */
+
 const defaultUser: User = {
-  firstName: '',
-  lastName: '',
-  email: '',
+  firstName: "",
+  lastName: "",
+  email: "",
   isLoggedIn: false,
   addresses: [],
 };
+
+/* ================= STORE ================= */
 
 export const useAppStore = create<AppState>((set, get) => ({
   user: defaultUser,
@@ -59,47 +69,65 @@ export const useAppStore = create<AppState>((set, get) => ({
   loading: true,
 
   hydrate: async () => {
-    const user = await getSecureItem<User>('user');
-    const cart = await getSecureItem<Product[]>('cart');
-    const wishlist = await getSecureItem<Product[]>('wishlist');
-    const location = await getSecureItem<LocationType>('location');
+    const cart = await getSecureItem<CartItem[]>("cart");
+    const user = await getSecureItem<User>("user");
 
     set({
-      user: user ?? defaultUser,
       cart: cart ?? [],
-      wishlist: wishlist ?? [],
-      location: location ?? null,
+      user: user ?? defaultUser,
       loading: false,
     });
   },
 
   setUser: async (user) => {
     set({ user });
-    await setSecureItem('user', user);
+    await setSecureItem("user", user);
   },
 
-  setCart: async (cart) => {
-    set({ cart });
-    await setSecureItem('cart', cart);
+  addToCart: async (item) => {
+    const cart = get().cart;
+    const existing = cart.find((i) => i.id === item.id);
+
+    let updatedCart: CartItem[];
+
+    if (existing) {
+      updatedCart = cart.map((i) =>
+        i.id === item.id
+          ? { ...i, quantity: i.quantity + item.quantity }
+          : i
+      );
+    } else {
+      updatedCart = [...cart, item];
+    }
+
+    set({ cart: updatedCart });
+    await setSecureItem("cart", updatedCart);
+  },
+
+  /* ✅ REMOVE ITEM */
+  removeFromCart: async (id) => {
+    const updatedCart = get().cart.filter((item) => item.id !== id);
+    set({ cart: updatedCart });
+    await setSecureItem("cart", updatedCart);
   },
 
   setWishlist: async (wishlist) => {
     set({ wishlist });
-    await setSecureItem('wishlist', wishlist);
+    await setSecureItem("wishlist", wishlist);
   },
 
   refreshLocation: async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') return;
+    if (status !== "granted") return;
 
     const pos = await Location.getCurrentPositionAsync({});
-    const newLocation = {
+    const location = {
       latitude: pos.coords.latitude,
       longitude: pos.coords.longitude,
     };
 
-    set({ location: newLocation });
-    await setSecureItem('location', newLocation);
+    set({ location });
+    await setSecureItem("location", location);
   },
 
   logout: async () => {
@@ -110,9 +138,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       location: null,
     });
 
-    await removeSecureItem('user');
-    await removeSecureItem('cart');
-    await removeSecureItem('wishlist');
-    await removeSecureItem('location');
+    await removeSecureItem("user");
+    await removeSecureItem("cart");
+    await removeSecureItem("wishlist");
+    await removeSecureItem("location");
   },
 }));

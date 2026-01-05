@@ -12,7 +12,7 @@ export const data =
    [
   {
     "storeId": "641e60d3e59a5c8e1b98701",
-    "name": "Wireless Mouse",
+    "name": "Wireless ",
     "description": "Ergonomic wireless mouse with USB receiver",
     "price": 25.99,
     "category": "Electronics",
@@ -23,7 +23,7 @@ export const data =
   },
     {
     "storeId": "64c1e6d3e59a5c8e1b98701",
-    "name": "Wireless Mouse",
+    "name": " Mouse",
     "description": "Ergonomic wireless mouse with USB receiver",
     "price": 25.99,
     "category": "Electronics",
@@ -33,20 +33,9 @@ export const data =
     "updatedAt": "2025-07-01T10:30:00Z"
   },
   
-  {
-    "storeId": "64c1e60d3e59a5c8e1b987011",
-    "name": "Bluetooth Speaker",
-    "description": "Portable speaker with 12-hour battery life",
-    "price": 45.50,
-    "category": "Audio",
-    "imageUrl": images.food2,
-    "isAvailable": true,
-    "createdAt": "2025-07-03T11:00:00Z",
-    "updatedAt": "2025-07-03T11:00:00Z"
-  },
-   {
+ {
     "storeId": "64c1e60d3e59a5c8e1b98701",
-    "name": "Bluetooth Speaker",
+    "name": " Speak",
     "description": "Portable speaker with 12-hour battery life",
     "price": 45.50,
     "category": "Audio",
@@ -57,7 +46,7 @@ export const data =
   },
   {
     "storeId": "64c1e60d3e59a5c8e1b9879999992",
-    "name": "Running Shoes",
+    "name": " Shoes",
     "description": "Breathable and lightweight running shoes",
     "price": 70.00,
     "category": "Footwear",
@@ -68,7 +57,7 @@ export const data =
   },
     {
     "storeId": "64c1e60d3e59a5c8e1b702",
-    "name": "Running Shoes",
+    "name": " Shoes",
     "description": "Breathable and lightweight running shoes",
     "price": 70.00,
     "category": "Footwear",
@@ -80,7 +69,7 @@ export const data =
 
   {
     "storeId": "64c1e60d3e59a5c8e1b9876hyyyy03",
-    "name": "Coffee Maker",
+    "name": " Maker",
     "description": "Automatic drip coffee maker with timer",
     "price": 89.99,
     "category": "Home Appliances",
@@ -91,7 +80,7 @@ export const data =
   },
   {
     "storeId": "64c1e60d3e59a5c8e1b98704",
-    "name": "Desk Lamp",
+    "name": " Lamp",
     "description": "LED desk lamp with adjustable brightness",
     "price": 32.25,
     "category": "Furniture",

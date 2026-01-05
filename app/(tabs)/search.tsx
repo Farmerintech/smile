@@ -1,18 +1,16 @@
 // screens/Search.tsx
-import { CartModal } from "@/components/cartModal";
 import { data } from "@/components/data";
-import { SearchInput } from "@/components/form/formInput";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
   FlatList,
   Image,
   SafeAreaView,
-  StatusBar,
-  Text,
+  TextInput,
   TouchableOpacity,
   View
 } from "react-native";
+import { AppText } from "../_layout";
 
 const items = [
   "All",
@@ -25,76 +23,132 @@ const items = [
   "More",
 ];
 
-
 const Search = () => {
   const [index, setIndex] = useState(0);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [img, setImg] = useState()
-  const [price, setPrice] = useState<number>()
+  const [img, setImg] = useState<any>();
+  const [price, setPrice] = useState<number>();
 
-  const  handleModalOpen = (item:any, price:number) =>{
+  const handleModalOpen = (item: any, price: number) => {
     setImg(item);
-    setModalVisible(true)
-    setPrice(price)
-  }
+    setModalVisible(true);
+    setPrice(price);
+  };
+
   return (
     <>
-      <SafeAreaView style={{ flex: 1 }}>
-        <StatusBar barStyle="dark-content" backgroundColor="white" />
-
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
         <FlatList
           data={data}
           keyExtractor={(item) => item.storeId.toString()}
           showsVerticalScrollIndicator={false}
+          stickyHeaderIndices={[0]}
           contentContainerStyle={{
             paddingBottom: 150,
-            zIndex:20
           }}
-          stickyHeaderIndices={[0]}
           ListHeaderComponent={
-            <View className="bg-[#F0F0F0]">
-              <View style={{ paddingHorizontal: 18, paddingTop: 50, backgroundColor: "white"}}>
-                <SearchInput
-                  name=""
-                  placeHolder=""
-                  action={() => {}}
-                  label=""
-                  value=""
-                  error=""
-                  icon=""
-                  style="py-2 border border-gray-200"
-                />
+            <View style={{ backgroundColor: "#F9FAFB" }}>
+              {/* Search + Filters */}
+              <View
+                style={{
+                  paddingHorizontal: 18,
+                  paddingTop: 10,
+                  backgroundColor: "#F9FAFB",
+                }}
+              >
+                {/* Search Input */}
+                <View
+  className="flex-row items-center shadow rounded-[20px] px-4 py-3 mb-4"
+  style={{
+    backgroundColor: "#F1F5F9", // inputBackground
+  }}
+>
+  {/* Search Icon */}
+  <Ionicons
+    name="search-outline"
+    size={20}
+    color="#6B7280" // textSecondary
+  />
+
+  {/* Input */}
+  <TextInput
+    className="flex-1 mx-3 text-[15px]"
+    placeholder="Search vendors around you..."
+    placeholderTextColor="#9CA3AF" // textMuted
+    onChangeText={() => {}}
+    value=""
+    style={{
+      color: "#1A1A1A", // textPrimary
+    }}
+  />
+
+  {/* Filter Button */}
+  <TouchableOpacity
+    activeOpacity={0.85}
+    className="h-10 w-10 items-center justify-center rounded-full"
+    style={{
+      backgroundColor: "#FF6B35", // primaryOrange
+    }}
+  >
+    <Ionicons
+      name="options-outline"
+      size={18}
+      color="#FFFFFF"
+    />
+  </TouchableOpacity>
+</View>
+
+                {/* Category Pills */}
                 <FlatList
                   data={items}
                   keyExtractor={(item) => item}
                   horizontal
                   showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ gap: 4, paddingVertical: 12,}}
-                  renderItem={({ item, index: i }) => (
-                    <TouchableOpacity
-                      onPress={() => setIndex(i)}
-                      className={`px-3 h-[30px] ${
-                        index === i ? "bg-black" : ""
-                      } rounded-[3px] flex items-center justify-center mr-2`}
-                    >
-                      <Text
-                        className={`${
-                          index === i ? "text-white" : "text-gray-600"
-                        }`}
+                  contentContainerStyle={{
+                    gap: 8,
+                    paddingVertical: 14,
+                  }}
+                  renderItem={({ item, index: i }) => {
+                    const active = index === i;
+
+                    return (
+                      <TouchableOpacity
+                        onPress={() => setIndex(i)}
+                        style={{
+                          paddingHorizontal: 14,
+                          height: 32,
+                          borderRadius: 16,
+                          backgroundColor: active ? "#FF6B35" : "#FFFFFF",
+                          borderWidth: 1,
+                          borderColor: active ? "#FF6B35" : "#E5E7EB",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
                       >
-                        {item}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
+                        <AppText
+                          style={{
+                            fontSize: 13,
+                            fontWeight: "500",
+                            color: active ? "#FFFFFF" : "#6B7280",
+                          }}
+                        >
+                          {item}
+                        </AppText>
+                      </TouchableOpacity>
+                    );
+                  }}
                 />
               </View>
 
+              {/* Results Header */}
               <View
                 style={{
                   paddingHorizontal: 16,
                   paddingVertical: 12,
-                  backgroundColor: "white", 
-                  marginTop:4
+                  backgroundColor: "#FFFFFF",
+                  marginTop: 6,
+                  borderTopLeftRadius: 16,
+                  borderTopRightRadius: 16,
                 }}
               >
                 <View
@@ -104,12 +158,27 @@ const Search = () => {
                     alignItems: "center",
                   }}
                 >
-                  <Text style={{ fontSize: 15, fontWeight: "500" }}>
+                  <AppText
+                    style={{
+                      fontSize: 15,
+                      fontWeight: "500",
+                      color: "#1A1A1A",
+                    }}
+                  >
                     25 Results for "Chicken"
-                  </Text>
-                  <Text style={{ fontSize: 14, color: "#f87171" }}>
-                    Clear Search
-                  </Text>
+                  </AppText>
+
+                  <TouchableOpacity>
+                    <AppText
+                      style={{
+                        fontSize: 14,
+                        fontWeight: "500",
+                        color: "#FF6B35",
+                      }}
+                    >
+                      Clear Search
+                    </AppText>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
@@ -117,15 +186,17 @@ const Search = () => {
           renderItem={({ item }) => (
             <View
               style={{
-                backgroundColor: "white",
+                backgroundColor: "#FFFFFF",
                 paddingHorizontal: 16,
                 paddingVertical: 12,
-                borderBottomColor: "gray",
+                borderBottomWidth: 1,
+                borderBottomColor: "#E5E7EB",
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
               }}
             >
+              {/* Image */}
               <View
                 style={{
                   width: 60,
@@ -140,34 +211,58 @@ const Search = () => {
                     width: 50,
                     height: 50,
                     resizeMode: "cover",
-                    borderRadius: 10,
+                    borderRadius: 12,
                   }}
                 />
               </View>
+
+              {/* Info */}
               <TouchableOpacity
                 style={{ flex: 1, marginLeft: 10 }}
                 onPress={() => {
                   handleModalOpen(item.imageUrl, item.price);
                 }}
               >
-                <Text style={{ fontSize: 16 }}>
+                <AppText
+                  style={{
+                    fontSize: 15,
+                    fontWeight: "500",
+                    color: "#1A1A1A",
+                  }}
+                >
                   Chicken Republic - {item.name}
-                </Text>
-                <Text style={{ color: "#555" }}>
-                  From N {item.price} | 12m ride
-                </Text>
+                </AppText>
+
+                <AppText
+                  style={{
+                    fontSize: 13,
+                    marginTop: 2,
+                    color: "#6B7280",
+                  }}
+                >
+                  From ₦{item.price} · 12m ride
+                </AppText>
               </TouchableOpacity>
-              <MaterialIcons name="favorite-outline" size={20} />
+
+              {/* Favorite */}
+              <MaterialIcons
+                name="favorite-outline"
+                size={22}
+                color="#9CA3AF"
+              />
             </View>
           )}
         />
       </SafeAreaView>
+
+      {/* Cart Modal
       <CartModal
         visible={isModalVisible}
         onRequestClose={() => setModalVisible(false)}
         source={img}
         price={price || 0}
-      />
+        count={0}
+      /> */}
     </>
   );
 };

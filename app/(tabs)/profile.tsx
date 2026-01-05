@@ -1,82 +1,146 @@
-import CountrySelectWithInput from "@/components/countries"
-import { FormDatePicker } from "@/components/form/datePicker"
-import FilePicker from "@/components/form/filePicker"
-import { InputFields } from "@/components/form/formInput"
-import { SafeAreaView, ScrollView, StatusBar, Text, TouchableOpacity, View } from "react-native"
 
- const Profile = () =>{
-    return(
-          <SafeAreaView style={{ flex: 1 }}>
-            <StatusBar barStyle="dark-content" backgroundColor={"white"} />
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-              contentContainerStyle={{ paddingTop: 10, paddingBottom:100, paddingHorizontal:16, backgroundColor:"white" }}>
-                <View className="">
-                <View className="flex items-center justify-center">
-                    <TouchableOpacity className="bg-[#1F2A370D] w-[200px] h-[200px] rounded-full">
-                        <FilePicker/>
-                    </TouchableOpacity>
-                </View>                            
-            <View className="flex flex-col gap-[12px] w-full py-12 ">
-          <CountrySelectWithInput
-            value={''}
-            onChange={() => {}}
-            error={''}
-          />
-                <InputFields
-                label="Email"
-                placeHolder=""
-                value={''}
-                action={(text) => {}}
-                name="Email"
-                error={''}
-                icon="account"
-              />     
-                <InputFields
-                label="First Name"
-                placeHolder=""
-                value={''}
-                action={(text) => {}}
-                name="FirstName"
-                error={''}
-                icon="account"
-              />     
-               <InputFields
-                label="Last Name"
-                placeHolder=""
-                value={''}
-                action={(text) => {}}
-                name="LastName"
-                error={''}
-                icon="account"
-              />    
-                        <View className="flex-row gap-[12px] w-full">
-                          <View className="flex-1">
-                            <FormDatePicker
-                              label="Date of Birth"
-                              icon="calendar"
-                              error={ ""}
-                              value={null}
-                              onChange={(date: Date) => {}}
-                            />
-                          </View>
-                        </View>
-                           <TouchableOpacity
-                             className="w-full bg-[#FF6347] py-[12px] rounded-[8px] mt-2 "
-                             onPress={()=>{}}
-                           >
-                             <Text className="text-white text-center font-semibold text-base">
-                               Save
-                             </Text>
-                           </TouchableOpacity>
-                          
-              </View>
-              </View>
-            </ScrollView>
-            </SafeAreaView>
-      
-    )
+import SettingsList from "@/components/settings";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+
+import {
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
+import "../../global.css";
+import { AppTextBold } from "../_layout";
+interface FormData {
+  phoneNumber: string
 }
-export default Profile
+const yakub = require('@/assets/images/yakub.jpg')
+const SignIn: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>({ phoneNumber: "" });
+  const [error, setError] = useState<Partial<FormData>>({});
+  const [loading, setLoading] = useState(false);
 
+  const handleFormChange = (key: keyof FormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
+    if (error[key]) setError((prev) => ({ ...prev, [key]: "" }));
+  };
+
+  const validate = (): boolean => {
+    let valid = true;
+    const newErrors: Partial<FormData> = {};
+
+    if (!formData.phoneNumber.trim()) {
+      newErrors.phoneNumber = "Phone number is required.";
+      valid = false;
+    } else if (!/^\d+$/.test(formData.phoneNumber)) {
+      newErrors.phoneNumber = "Phone number must contain only digits.";
+      valid = false;
+    }
+
+    setError(newErrors);
+    return valid;
+  };
+
+  const handleSubmit = async () => {
+    if (!validate()) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch("your-api-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Login failed:", errorData.message || response.statusText);
+      } else {
+        // Handle success
+      }
+    } catch (error) {
+      console.error("Network or server error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#093131", paddingTop:10 }}>
+
+
+      {/* Top 25% */}
+      <View style={{ flex: 0.5, justifyContent: "flex-start", alignItems:"center", paddingHorizontal: 24}}>
+        <StatusBar barStyle={"light-content"} backgroundColor={"#093131"}/>
+        
+        <View className="bg-[#FF6B35] w-[80px] h-[40px] flex justify-center absolute right-10 mt-5 flex-row items-center px-5 rounded-full">
+          <AppTextBold className="text-[20px] font-bold text-white text-center mb-2 ">
+          Help
+        </AppTextBold>
+        </View>
+      </View>
+      <View className="flex items-center flex-row justify-between px-5 mb-5">
+       <View className="flex flex-row items-center justify-start gap-3 ">
+         <View className="">
+              <Image
+            source={yakub}
+            style={{
+              width: 100,
+              height: 100,
+              borderRadius: 50,
+              borderWidth: 3,
+              borderColor: "#FF6B35",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 5,
+            }}
+          />
+        </View>
+        <View className="flex items-start">
+          <AppTextBold className="text-[28px] text-white text-center mb-2">
+          Yakub
+        </AppTextBold>
+        <Text className="text-white">Shakirudeen Olaide</Text>
+        </View>
+       </View>
+        <TouchableOpacity>
+          <Ionicons name="chevron-forward" size={25} color="#FF6B35"/>
+        </TouchableOpacity>
+      </View>
+
+      {/* Bottom 75% Modal */}
+      <View
+        style={{
+          flex: 3,
+          backgroundColor: "#FFF",
+          borderTopLeftRadius: 32,
+          borderTopRightRadius: 32,
+          paddingHorizontal: 2,
+          paddingTop: 32,
+        }}
+      >
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+
+          <View style={{ flex: 1, justifyContent: "flex-end", paddingHorizontal: 24, }}>
+            <AppTextBold className="text-[30px] font-[600] text-left mb-2">
+              Profile
+            </AppTextBold>
+          </View>
+
+         <SettingsList/>
+        </ScrollView>
+
+      </View>
+
+    </SafeAreaView>
+  );
+};
+
+export default SignIn;

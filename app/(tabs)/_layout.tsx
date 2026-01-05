@@ -1,184 +1,231 @@
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Tabs, useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { Image, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AppText } from '../_layout';
+import { useAppStore } from '../store/useAppStore';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const insets = useSafeAreaInsets();
-  const router = useRouter()
-  const items = [
-    "All",
-    "Resturants",
-    "Pharmacies",
-    "Supermarket",
-    "Local Markets",
-    "Packages",
-    "Lugage",
-    "More",
-  ];
-  
-    const [index, setIndex] = useState(0);
-  
+  const router = useRouter();
+  const yakub = require("@/assets/images/yakub.jpg")
+  const {cart} = useAppStore()
+
+ 
+  const moveToCart = () => {
+    router.push("/order"); // <-- use push, not a direct call
+  };
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#FF6347',
-        tabBarInactiveTintColor: 'black',
         headerShown: false,
+        tabBarActiveTintColor: '#093131',
+        tabBarInactiveTintColor: 'gray',
 
+        // Background of the tab bar
         tabBarBackground: () => (
           <View
-            className="bg-white border-t border-gray-200 shadow-md shadow-black/10"
+            className="bg-white shadow-md shadow-black/10"
             style={{
               flex: 1,
-              borderTopWidth: Platform.OS === 'android' ? 1 : 0,
+              borderTopWidth: Platform.OS === "android" ? 0 : 0,
             }}
           />
         ),
 
+        // Sticky tab bar style
         tabBarStyle: {
-          position: 'absolute',
+          position: "absolute", // sticky
           left: 0,
           right: 0,
-          backgroundColor: 'transparent',
+          bottom: 0,
+          backgroundColor: "transparent",
           borderTopWidth: 0,
-          height: 90 + insets.bottom,
-          paddingTop:20,
+          height: 60 + insets.bottom, // enough for icon + label
+          paddingTop: 5,
           paddingBottom: insets.bottom,
-          elevation: 4,
+          elevation: 8,
+        },
+
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontFamily:'Inter_700Bold' ,
+          marginBottom: 5, // ensures label is visible
         },
       }}
     >
+      {/* Home */}
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Home',
           headerShown: true,
+          headerShadowVisible: false,
           headerStyle: {
-            backgroundColor: 'white',
-            elevation: 0,
+            backgroundColor: "#F9FAFB",
+            height: 70,
           },
           headerTitle: () => (
-            <View className="flex flex-row justify-between items-center px-[5px] w-full">
-              <View className="flex flex-col">
-                {/* <Text className="font-semibold text-[14px] text-gray-700">Deliver to</Text> */}
-                <View className="flex flex-row items-center space-x-2">
-                   <MaterialIcons
-                    name="place"
-                    size={15}
-                    color="#22AD5C"
-                  />
-                  <TouchableOpacity>
-                    <Text className="text-[14px] font-[600] text-black" style={{fontFamily:"Roboto_400Regular "}}>Select Your Location...</Text>
-                  </TouchableOpacity>
-                  <MaterialIcons
-                    name="keyboard-arrow-down"
-                    size={20}
-                    color="#22AD5C"
-                  />
-                </View>
-              </View>
+            <View className=" pt-4">
               <View
-                className="w-[40px] h-[40px] rounded-full bg-white/10 flex items-center justify-center"
-                style={{
-                  shadowColor: 'rgba(13, 10, 44, 0.06)',
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 1,
-                  shadowRadius: 12,
-                  elevation: 3,
-                }}
+                className="flex-row items-center justify-between mb-2"
+                style={{ gap: 30 }}
               >
-                <MaterialCommunityIcons
-                  name="shopping-outline"
-                  size={20}
-                  color="black"
-                />
+                <View className="flex-row items-center justify-between mb-2"
+                style={{ gap: 10 }}>
+                <Image
+            source={yakub}
+            style={{
+              width: 50,
+              height: 50,
+              borderRadius: 50,
+              borderWidth: 3,
+              borderColor: "#FF6B35",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 5,
+            }}
+          />
+                {/* Greeting */}
+                <View>
+                  <AppText
+                    className="text-[20px] font-bold"
+                    style={{ color: "#1A1A1A" }}
+                  >
+                    Hello, Yakub 👋
+                  </AppText>
+                  <Text className="text-[14px]" style={{ color: "#6B7280" }}>
+                    What can we help you find?
+                  </Text>
+                </View>
+                </View>
+            <View className='flex gap-4 flex-row items-center'>
+                  {/* Notifications */}
+                <View className="flex-row items-center gap-3">
+                  <TouchableOpacity
+                    className="h-10 w-10 items-center justify-center rounded-full"
+                    style={{
+                      backgroundColor: "#FFFFFF",
+                      shadowColor: "#000",
+                      shadowOpacity: 0.08,
+                      shadowRadius: 6,
+                      shadowOffset: { width: 0, height: 3 },
+                      elevation: 3,
+                    }}
+                  >
+                    <Ionicons
+                      name="notifications-outline"
+                      size={20}
+                      color="#1A1A1A"
+                    />
+                  </TouchableOpacity>
+                </View>
+                 <View className="flex-row items-center gap-3">
+                  <TouchableOpacity
+                  onPress={()=>{moveToCart()}}
+                    className="h-10 w-10 items-center justify-center rounded-full"
+                    style={{
+                      backgroundColor: "#FFFFFF",
+                      shadowColor: "#000",
+                      shadowOpacity: 0.08,
+                      shadowRadius: 6,
+                      shadowOffset: { width: 0, height: 3 },
+                      elevation: 3,
+                    }}
+                  >
+                    <View className='relative'>
+                      <Ionicons
+                      name="cart-outline"
+                      size={20}
+                      color="#1A1A1A"
+                    />
+                    <Text className='absolute -top-3 left-2 text-[#FF6B35]'>{cart.length}</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+            </View>
+
               </View>
             </View>
           ),
-          headerTitleAlign: 'left',
+          headerTitleAlign: "left",
+
+          tabBarLabel: "Home",
           tabBarIcon: ({ focused }) => (
-            <Ionicons
-              name="home-outline"
-              size={30}
-              color={focused ? '#FF6347' : 'black'}
+            <MaterialIcons
+              name="home"
+              size={22}
+              color={focused ? "#FF6B35" : "#9CA3AF"}
             />
           ),
         }}
       />
-<Tabs.Screen
+
+      {/* Search */}
+      <Tabs.Screen
         name="search"
         options={{
           title: 'Search',
+          tabBarLabel: "Search",
           tabBarIcon: ({ focused }) => (
             <Ionicons
-              name="search-outline"
-              size={26}
-              color={focused ? '#FF6347' : 'black'}
+              name="search"
+              size={20}
+              color={focused ? '#093131' : 'gray'}
             />
           ),
         }}
       />
+
+      {/* Orders */}
       <Tabs.Screen
         name="order"
         options={{
-          title: 'Order',
+          title: 'Orders',
+          headerShown: false,
+          headerStyle: {
+            backgroundColor: '#093131',
+            elevation: 4,
+          },
+          headerTitle: () => (
+            <Text className="text-white font-semibold text-[18px] px-4">Orders</Text>
+          ),
+          tabBarLabel: "Orders",
           tabBarIcon: ({ focused }) => (
             <Ionicons
-              name="cart-outline"
-              size={26}
-              color={focused ? '#FF6347' : 'black'}
+              name="bag"
+              size={20}
+              color={focused ? '#093131' : 'gray'}
             />
           ),
         }}
       />
-         <Tabs.Screen
-        name="support"
-        options={{
-          title: 'Support',
-          tabBarIcon: ({ focused }) => (
-            <Ionicons
-              name="chatbubble-outline"
-              size={26}
-              color={focused ? '#FF6347' : 'black'}
-            />
-          ),
-        }}
-      />
-   
 
+      {/* Profile */}
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          headerShown: true,
-          headerShadowVisible:true,
-          // headerStyle: {
-          //   backgroundColor: 'white',
-          //   elevation: 0,
-          // },
-          
           headerTitle: () => (
-            <View className="flex flex-row justify-start gap-[16px] items-center px-[5px] w-full">
-              <TouchableOpacity onPress={()=>router.back()} className='items-center justify-center flex'>
-              <MaterialIcons
-              name="chevron-left"
-              size={26}
-              color={'black'}
-            />
+            <View className="flex flex-row justify-start gap-4 items-center px-4 w-full">
+              <TouchableOpacity
+                onPress={() => router.back()}
+                className="items-center justify-center flex"
+              >
+                <MaterialIcons name="chevron-left" size={26} color={'black'} />
               </TouchableOpacity>
-              <Text className='font-[600] text-[16px]'>Profile</Text>
-            </View>    
-          ),   
-
+              <AppText className="font-semibold text-[16px]">Profile</AppText>
+            </View>
+          ),
+          tabBarLabel: "Profile",
           tabBarIcon: ({ focused }) => (
             <Ionicons
-              name="person-outline"
-              size={26}
-              color={focused ? '#FF6347' : 'black'}
+              name="person"
+              size={20}
+              color={focused ? '#093131' : 'gray'}
             />
           ),
         }}

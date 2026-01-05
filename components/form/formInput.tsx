@@ -32,9 +32,9 @@ export const InputFields: React.FC<InputFieldsProps> = ({
       ) : null}
 
 <View
-  className="flex justify-between items-center flex-row p-4 py-6 text-black rounded-full"
+  className="flex justify-between items-center flex-row py-1 px-8  rounded-full"
   style={{
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: error.trim() !== "" ? "#F87171" : "#E9EAEB",
   }}
 >
@@ -52,7 +52,7 @@ export const InputFields: React.FC<InputFieldsProps> = ({
             secureTextEntry={name === "Password" && !showPsw}
             onChangeText={action}
             keyboardType={name === "Phone Number" ? "phone-pad" : "default"}
-            className="w-full outline-none border-none"
+            className="w-full outline-none border-none items-center text-center"
           />
         </View>
 
@@ -69,7 +69,7 @@ export const InputFields: React.FC<InputFieldsProps> = ({
 
       {/* Error message */}
       {error ? (
-        <Text className="text-[10px] italic text-red-500 font-serif">{error}</Text>
+        <Text className="text-[10px] italic text-red-500 text-white font-serif">{error}</Text>
       ) : null}
     </View>
   );
@@ -93,21 +93,23 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 }) => {
   return (
     <View
-      className={`flex justify-between items-center flex-row bg-[#1F2A370D] min-h-14 p-4 py-1 text-black rounded-[7px]`}
-      style={style}
+      className={`flex justify-between items-center flex-row  rounded-full border border-white/10 bg-black/30 min-h-14 p-3  text-black `}
+      style={{borderWidth:2, }}
     >
       <View className="flex-1 items-center justify-between flex-row gap-[8px]">
-        <MaterialCommunityIcons name={"magnify"} size={25} />
+        <MaterialCommunityIcons name={"magnify"} size={25} color={"white"} />
         <TextInput
           placeholder={placeHolder}
           value={value}
           onChangeText={action}
-          className="w-full outline-none border-none"
+          placeholderTextColor={"white"}
+          className="w-full outline-none border-none text-white"
+          style={{color:"white"}}
         />
       </View>
 
       <TouchableOpacity className="flex items-center justify-center">
-        <MaterialCommunityIcons name={"tune"} size={25} />
+        <MaterialCommunityIcons name={"tune"} size={25} color={"white"}/>
       </TouchableOpacity>
     </View>
   );

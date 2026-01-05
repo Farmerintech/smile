@@ -1530,11 +1530,11 @@ const CountrySelectWithInput = ({ value, onChange, error, label = "Phone Number"
   return (
     <View className="flex-row items-start gap-2 w-full">
       {/* Country Code + Phone Input */}
-      <View className="flex-row items-center space-x-2 w-full">
+      <View className="flex-row items-center  justify-between space-x-2 w-full">
         {/* Country Picker - 40% width */}
         <View className="w-[35%]">
           <TouchableOpacity
-            className="px-4 py-6 rounded-full border border-gray-200 flex-row items-center justify-between"
+            className="px-4 py-3 rounded-full  border border-gray-200 flex-row items-center justify-between"
             onPress={() => setModalVisible(true)}
           >
             <Text className="text-[20px]">

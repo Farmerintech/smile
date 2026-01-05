@@ -1,10 +1,10 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { useAppContext } from './context/reducer';
+import { useAppStore } from './store/useAppStore';
 
 export const SplashScreen = () => {
-  const { user, loading } = useAppContext();
+  const { user, loading } = useAppStore();
   const navigation = useNavigation<any>();
 
   useEffect(() => {

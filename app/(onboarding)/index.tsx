@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ProgressBar } from '../../components/progressBar';
 import "../../global.css";
@@ -23,6 +23,10 @@ export default function Index() {
     //     console.error('Failed to load user data:', error);
     //   }
     // #093131
+    // #328264
+    // #083232
+    // #c6D7Cf
+    // #34A979
     //bg-[#1EBA8D]/20
 
 // Details
@@ -47,7 +51,6 @@ const style = StyleSheet.create({
 })
   return (
     <>
-      <StatusBar />
       <ScrollView 
         contentContainerClassName=' py-[12px]  flex-1 items-center justify-center bg-[#093131]'
       >
