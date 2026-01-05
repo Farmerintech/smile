@@ -1,9 +1,8 @@
 import { AppTextBold } from "@/app/_layout";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
-
-const SettingsList = () => {
-  const Item = ({
+ export const Item = ({
     icon,
     label,
     danger,
@@ -66,6 +65,12 @@ const SettingsList = () => {
       />
     </TouchableOpacity>
   );
+const SettingsList = () => {
+  const router = useRouter();
+
+  const goTo = () =>{
+    router.push("/(screens)/account")
+  }
 
   return (
     <View
@@ -78,7 +83,7 @@ const SettingsList = () => {
       }}
     >
       <Item icon="receipt-outline" label="Order History" />
-      <Item icon="person-outline" label="Account" />
+      <Item icon="person-outline" label="Account" onPress={()=>{goTo()}} />
       <Item icon="notifications-outline" label="Notifications" />
       <Item icon="trash-outline" label="Delete my account" danger />
       <Item icon="log-out-outline" label="Logout" danger />
