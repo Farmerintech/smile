@@ -36,20 +36,6 @@ export default function TabLayout() {
           />
         ),
 
-        // Sticky tab bar style
-        tabBarStyle: {
-          position: "absolute", // sticky
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "transparent",
-          borderTopWidth: 0,
-          height: 60 + insets.bottom, // enough for icon + label
-          paddingTop: 5,
-          paddingBottom: insets.bottom,
-          elevation: 8,
-        },
-
         tabBarLabelStyle: {
           fontSize: 12,
           fontFamily:'Inter_700Bold' ,
@@ -65,7 +51,7 @@ export default function TabLayout() {
           headerShadowVisible: false,
           headerStyle: {
             backgroundColor: "#F9FAFB",
-            height: 70,
+            // height: 70,
           },
           headerTitle: () => (
             <View className=" pt-4">

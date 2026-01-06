@@ -9,7 +9,6 @@ import {
   Dimensions,
   FlatList,
   Image,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   Text,
@@ -126,7 +125,7 @@ const { addToCart } = useAppStore();
     content: {
       title: `Cart Updated`,
       body: `${selectedItem.name} added to cart- ${itemCounts[selectedItem.storeId]}`,
-      sound: "notification.mp3"
+      sound: "default"
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
@@ -140,12 +139,12 @@ const { addToCart } = useAppStore();
 
   return (
     <>
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingTop: 0, paddingBottom: 100 }}
-        >
+     <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
+  <ScrollView
+    showsVerticalScrollIndicator={false}
+    keyboardShouldPersistTaps="handled"
+    contentContainerStyle={{ paddingBottom: 20 }}
+  >
           <StatusBar backgroundColor={"white"} barStyle={"dark-content"}/>
           <View className="w-full p-4 ">
             <View
@@ -424,7 +423,7 @@ const { addToCart } = useAppStore();
 
         </ScrollView>
 
-      </SafeAreaView>
+      </View>
       {/* ✅ CART MODAL */}
          {selectedItem && (
         <CartModal

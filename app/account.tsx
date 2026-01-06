@@ -13,10 +13,10 @@ const Account: React.FC = () => {
         overflow: "scroll",
       }}
     >
-      <Item icon="person-outline" label="Yakub" />
+      <Item icon="person" label="Yakub" />
       <Item icon="mail" label="farmerintech@gmail.com" />
       <Item icon="key" label="Change password" />
-      <Item icon="phone" label="Change number" />
+      <Item icon="call" label="Change number" />
       <Item icon="wallet" label="Payment methods"  />
       <Item icon="settings" label="support"  />
     </View>

@@ -1,10 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import {
   Image,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { AppText } from "../_layout";
 import { useAppStore } from "../store/useAppStore";
@@ -29,7 +28,7 @@ const removeItem = async (id: string) => {
 };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white", paddingBottom: 160, }}>
+    <View style={{ flex: 1, backgroundColor: "white", paddingBottom: 160, }}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -110,7 +109,7 @@ const removeItem = async (id: string) => {
 
       {/* ================= CHECKOUT ================= */}
       {!isEmpty && (
-        <View className="absolute bottom-20 left-0 right-0 bg-white p-5 border-t border-gray-200">
+        <View className="absolute bottom-0 left-0 right-0 bg-white p-5 border-t border-gray-200">
           <View className="flex-row justify-between mb-2">
             <AppText>Subtotal</AppText>
             <AppText>₦{subTotal}</AppText>
@@ -133,7 +132,7 @@ const removeItem = async (id: string) => {
           </TouchableOpacity>
         </View>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

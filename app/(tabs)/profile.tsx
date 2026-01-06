@@ -6,7 +6,6 @@ import React, { useState } from "react";
 import { useStatusBar } from "@/hooks/statusBar";
 import {
   Image,
-  SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -69,7 +68,7 @@ const SignIn: React.FC = () => {
   };
 
  useStatusBar("#093131", "light-content");  return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#093131", paddingTop:10 }}>
+    <View style={{ flex: 1, backgroundColor: "#093131", paddingTop:30 }}>
 
 
       {/* Top 25% */}
@@ -138,7 +137,7 @@ const SignIn: React.FC = () => {
 
       </View>
 
-    </SafeAreaView>
+    </View>
   );
 };
 
