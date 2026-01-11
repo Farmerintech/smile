@@ -67,9 +67,12 @@ const SignIn: React.FC = () => {
     }
   };
 
- useStatusBar("#093131", "light-content");  return (
+ useStatusBar("#093131", "light-content");  
+ 
+ return (
     <View style={{ flex: 1, backgroundColor: "#093131", paddingTop:30 }}>
 
+          {/* <StatusBar backgroundColor={"#093131"} barStyle={"light-content"}/> */}
 
       {/* Top 25% */}
       <View style={{ flex: 0.5, justifyContent: "flex-start", alignItems:"center", paddingHorizontal: 24}}>

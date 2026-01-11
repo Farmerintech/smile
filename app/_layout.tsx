@@ -3,6 +3,7 @@ import { setupOnlineManager } from "@/app/lib/onlineManager";
 import { queryClient } from "@/app/lib/queryClient";
 import { useAppStore } from "@/app/store/useAppStore";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import {
   Inter_400Regular,
@@ -18,8 +19,8 @@ import { Stack } from "expo-router";
 import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
 
-import { useEffect } from "react";
-import { Text, TextProps } from "react-native";
+import { useEffect, useState } from "react";
+import { AppState, Text, TextProps } from "react-native";
 
 /* ================================
    🔔 NOTIFICATIONS (GLOBAL)
@@ -78,7 +79,14 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
+const [appState, setAppState] = useState(AppState.currentState);
 
+useEffect(() => {
+  const sub = AppState.addEventListener('change', nextState => {
+    setAppState(nextState);
+  });
+  return () => sub.remove();
+}, []);
   // Keep splash screen visible until fonts load
   if (!fontsLoaded) {
     return null;
@@ -90,16 +98,18 @@ export default function RootLayout() {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(onboarding)" options={screenOptions} />
-          <Stack.Screen name="(auth)" options={screenOptions} />
-          <Stack.Screen name="splash" options={screenOptions} />
-          <Stack.Screen name="(tabs)" options={screenOptions} />
-        </Stack>
-      </ThemeProvider>
-    </QueryClientProvider>
+     <SafeAreaProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+          <Stack>
+            <Stack.Screen name="(onboarding)" options={screenOptions} />
+            <Stack.Screen name="(auth)" options={screenOptions} />
+            <Stack.Screen name="splash" options={screenOptions} />
+            <Stack.Screen name="(tabs)" options={screenOptions} />
+          </Stack>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </SafeAreaProvider>
   );
 }
 

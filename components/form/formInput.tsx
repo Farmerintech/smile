@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import "../../global.css";
@@ -43,7 +43,7 @@ export const InputFields: React.FC<InputFieldsProps> = ({
         <View className="flex items-center justify-between flex-row gap-[8px] flex-1">
           {/* Show icon for fields except phone number */}
           {name && name !== "Phone Number" && icon && (
-            <MaterialCommunityIcons name={icon} size={15} />
+            <Ionicons name={icon} size={15} />
           )}
 
           <TextInput
@@ -52,7 +52,7 @@ export const InputFields: React.FC<InputFieldsProps> = ({
             secureTextEntry={name === "Password" && !showPsw}
             onChangeText={action}
             keyboardType={name === "Phone Number" ? "phone-pad" : "default"}
-            className="w-full outline-none border-none items-center text-center"
+            className="w-full"
           />
         </View>
 

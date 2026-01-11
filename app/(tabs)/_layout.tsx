@@ -34,12 +34,21 @@ export default function TabLayout() {
               borderTopWidth: Platform.OS === "android" ? 0 : 0,
             }}
           />
+          
         ),
-
+    //     tabBarStyle: {
+      
+    //   height: 80,   
+    //   paddingTop:5,          // fixed height
+    //   paddingBottom: 0,       // remove extra insets
+    //   borderTopWidth: 0,      // optional
+    //   backgroundColor: 'white', // optional
+    //   elevation: 5,           // shadow for Android
+    // },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 13,
           fontFamily:'Inter_700Bold' ,
-          marginBottom: 5, // ensures label is visible
+          marginBottom: 8, // ensures label is visible
         },
       }}
     >
@@ -144,7 +153,7 @@ export default function TabLayout() {
             <MaterialIcons
               name="home"
               size={22}
-              color={focused ? "#FF6B35" : "#9CA3AF"}
+              color={focused ? "#093131" : "gray"}
             />
           ),
         }}

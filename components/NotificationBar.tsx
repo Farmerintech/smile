@@ -1,10 +1,10 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 
 export const NotificationBar = ({ text, trigger }: { text: string, trigger: any }) => {
   const [show, setShow] = useState<boolean>(false);
-
+  
  useEffect(() => {
   if (trigger) {
     setShow(true);

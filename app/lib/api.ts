@@ -1,5 +1,6 @@
 import { useAppStore } from '../store/useAppStore';
 
+export const BaseURL = `http://localhost:8000/api/v1`
 export async function apiRequest<T>({
   url,
   method = 'GET',

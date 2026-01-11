@@ -5,7 +5,6 @@ import { useState } from "react";
 import {
   FlatList,
   Image,
-  SafeAreaView,
   TextInput,
   TouchableOpacity,
   View
@@ -37,7 +36,7 @@ const Search = () => {
 
   return (
     <>
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
+      <View style={{ flex: 1, backgroundColor: "#F9FAFB", paddingTop:40 }}>
         <FlatList
           data={data}
           keyExtractor={(item) => item.storeId.toString()}
@@ -45,6 +44,7 @@ const Search = () => {
           stickyHeaderIndices={[0]}
           contentContainerStyle={{
             paddingBottom: 150,
+            
           }}
           ListHeaderComponent={
             <View style={{ backgroundColor: "#F9FAFB" }}>
@@ -253,7 +253,7 @@ const Search = () => {
             </View>
           )}
         />
-      </SafeAreaView>
+      </View>
 
       {/* Cart Modal
       <CartModal

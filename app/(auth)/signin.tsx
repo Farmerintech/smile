@@ -1,5 +1,5 @@
-import CountrySelectWithInput from "@/components/countries";
 import { Link } from "expo-router";
+import Joi from "joi";
 import React, { useState } from "react";
 import {
   SafeAreaView,
@@ -9,36 +9,74 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import "../../global.css";
 
+import { InputFields } from "@/components/form/formInput";
+import "../../global.css";
+import { BaseURL } from "../lib/api";
+
+/* ===================== TYPES ===================== */
 interface FormData {
-  phoneNumber: string;
+  email: string;
+  password: string;
 }
 
+/* ===================== JOI SCHEMA ===================== */
+const signInSchema = Joi.object<FormData>({
+  email: Joi.string()
+    .email({ tlds: { allow: false } })
+    .required()
+    .messages({
+      "string.empty": "Email is required",
+      "string.email": "Enter a valid email address",
+    }),
+
+  password: Joi.string()
+    .min(6)
+    .required()
+    .messages({
+      "string.empty": "Password is required",
+      "string.min": "Password must be at least 6 characters",
+    }),
+});
+
+/* ===================== COMPONENT ===================== */
 const SignIn: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({ phoneNumber: "" });
+  const [formData, setFormData] = useState<FormData>({
+    email: "",
+    password: "",
+  });
+
   const [error, setError] = useState<Partial<FormData>>({});
   const [loading, setLoading] = useState(false);
 
+  /* ===================== HANDLERS ===================== */
   const handleFormChange = (key: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
-    if (error[key]) setError((prev) => ({ ...prev, [key]: "" }));
+
+    if (error[key]) {
+      setError((prev) => ({ ...prev, [key]: "" }));
+    }
   };
 
   const validate = (): boolean => {
-    let valid = true;
-    const newErrors: Partial<FormData> = {};
+    const { error } = signInSchema.validate(formData, {
+      abortEarly: false,
+    });
 
-    if (!formData.phoneNumber.trim()) {
-      newErrors.phoneNumber = "Phone number is required.";
-      valid = false;
-    } else if (!/^\d+$/.test(formData.phoneNumber)) {
-      newErrors.phoneNumber = "Phone number must contain only digits.";
-      valid = false;
+    if (!error) {
+      setError({});
+      return true;
     }
 
+    const newErrors: Partial<FormData> = {};
+
+    error.details.forEach((detail) => {
+      const key = detail.path[0] as keyof FormData;
+      newErrors[key] = detail.message;
+    });
+
     setError(newErrors);
-    return valid;
+    return false;
   };
 
   const handleSubmit = async () => {
@@ -46,39 +84,49 @@ const SignIn: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await fetch("your-api-url", {
+      const response = await fetch(`${BaseURL}/auth/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Login failed:", errorData.message || response.statusText);
+        console.error("Login failed:", data?.message);
       } else {
-        // Handle success
+        console.log("Login success:", data);
+        // navigate or save token here
       }
-    } catch (error) {
-      console.error("Network or server error:", error);
+    } catch (err) {
+      console.error("Network error:", err);
     } finally {
       setLoading(false);
     }
   };
 
+  /* ===================== UI ===================== */
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#093131" }}>
       <StatusBar barStyle="light-content" />
 
-      {/* Top 25% */}
-      <View style={{ flex: 1, justifyContent: "flex-end", paddingHorizontal: 24}}>
+      {/* Top Section */}
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "flex-end",
+          paddingHorizontal: 24,
+        }}
+      >
         <Text className="text-[48px] font-bold text-white text-center mb-2">
           Smile
         </Text>
-        <Text className="text-[#CFEDEA] text-center text-[14px]">
-        </Text>
+        <Text className="text-[#CFEDEA] text-center text-[14px]" />
       </View>
 
-      {/* Bottom 75% Modal */}
+      {/* Bottom Section */}
       <View
         style={{
           flex: 3,
@@ -93,58 +141,65 @@ const SignIn: React.FC = () => {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={{ flex: 1, justifyContent: "flex-end", paddingHorizontal: 24 }}>
-            <Text className="text-[30px] font-bold text-center mb-2">
-              Welcome
-            </Text>
-            <Text className=" text-center text-[16px]">
-              Let's get you started with phone number
-            </Text>
-          </View>
-          <View className="flex flex-col gap-4 mt-4">
-            {/* Phone Input */}
-            <CountrySelectWithInput
-              value={formData.phoneNumber}
-              onChange={(text: any) => handleFormChange("phoneNumber", text)}
-              error={error.phoneNumber}
+          <Text className="text-[30px] font-bold text-center mb-2">
+            Welcome Back
+          </Text>
+          <Text className="text-center text-[18px] mb-6">
+            Let’s get you signed in 👋
+          </Text>
+
+          <View className="flex flex-col gap-4">
+            {/* Email */}
+            <InputFields
+              label=""
+              placeHolder="Email"
+              value={formData.email}
+              action={(value: string) =>
+                handleFormChange("email", value)
+              }
+              name="email"
+              icon="mail"
+              error={error.email}
             />
 
+            {/* Password */}
+            <InputFields
+              label=""
+              placeHolder="Password"
+              value={formData.password}
+              action={(value: string) =>
+                handleFormChange("password", value)
+              }
+              name="password"
+              icon="key"
+              // secureTextEntry
+              error={error.password}
+            />
+          </View>
 
-
-            {/* Continue Button */}
-            <View className="flex flex-row items-center justify-center gap-4">
-              {/* SMS Button */}
-              <TouchableOpacity
-                className={`flex-1 py-4 rounded-full border border-gray-400`}
-                onPress={handleSubmit}
-                disabled={loading} // disable while loading
-              >
-                <Text className="text-black text-center font-semibold text-base">
-                  {loading ? "Loading..." : "SMS"}
-                </Text>
-              </TouchableOpacity>
-
-              {/* WhatsApp Button */}
-              <TouchableOpacity
-                className={`flex-1 py-4 rounded-full ${loading ? "bg-gray-400" : "bg-[#093131]"}`}
-                onPress={handleSubmit}
-                disabled={loading} // disable while loading
-              >
-                <Text className="text-white text-center font-semibold text-base">
-                  {loading ? "Loading..." : "WhatsApp"}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Register Link */}
-            <View className="flex flex-row items-center justify-center gap-2 mt-4">
-              <Text className="text-gray-500 text-sm">
-                Never had a Smile account?
+          {/* Submit */}
+          <View className="mt-6">
+            <TouchableOpacity
+              className={`py-4 rounded-full ${
+                loading ? "bg-gray-400" : "bg-[#093131]"
+              }`}
+              onPress={handleSubmit}
+              disabled={loading}
+            >
+              <Text className="text-white text-center font-semibold text-base">
+                {loading ? "Signing in..." : "Login"}
               </Text>
-              <Link href="/home" className="underline text-[#1EBA8D] text-sm">
-                Register
-              </Link>
-            </View>
+            </TouchableOpacity>
+          </View>
+
+          {/* Register */}
+          <View className="flex flex-row items-center justify-center gap-2 mt-6">
+            <Text className="text-gray-500 text-sm">
+              Don’t have a Smile account?
+            </Text>
+            <Link href="/signup" className="underline text-[#1EBA8D] text-sm">
+              Register
+            </Link>
           </View>
         </ScrollView>
       </View>

@@ -10,7 +10,6 @@ import {
   FlatList,
   Image,
   ScrollView,
-  StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
@@ -60,7 +59,6 @@ const Home = () => {
 const { addToCart } = useAppStore();
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
- useStatusBar("white", "dark-content");
 
   const [itemCounts, setItemCounts] = useState<Record<number, number>>({});
 
@@ -136,16 +134,19 @@ const { addToCart } = useAppStore();
   const { width } = Dimensions.get("window");
 
   const cardWidth = width * 0.45;
+ useStatusBar("white", "dark-content");
 
   return (
     <>
      <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
   <ScrollView
-    showsVerticalScrollIndicator={false}
-    keyboardShouldPersistTaps="handled"
-    contentContainerStyle={{ paddingBottom: 20 }}
-  >
-          <StatusBar backgroundColor={"white"} barStyle={"dark-content"}/>
+  showsVerticalScrollIndicator={false}
+  keyboardShouldPersistTaps="handled"
+  contentContainerStyle={{ paddingBottom: 0 }}
+  contentInsetAdjustmentBehavior="automatic"
+>
+
+          {/* <StatusBar backgroundColor={"white"} barStyle={"dark-content"}/> */}
           <View className="w-full p-4 ">
             <View
               className="flex-row items-center shadow rounded-[20px] px-4 py-3 mb-4"
