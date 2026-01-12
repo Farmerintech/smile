@@ -18,8 +18,7 @@ import { BaseURL } from "../lib/api";
 /* ===================== TYPES ===================== */
 interface FormData {
   phoneNumber: string;
-  firstName: string;
-  lastName: string;
+  username: string;
   email: string;
   password: string;
 }
@@ -35,12 +34,8 @@ const signUpSchema = Joi.object<FormData>({
       "string.pattern.base": "Phone number must contain only digits",
     }),
 
-  firstName: Joi.string().min(2).required().messages({
-    "string.empty": "First name is required",
-  }),
-
-  lastName: Joi.string().min(2).required().messages({
-    "string.empty": "Last name is required",
+  username: Joi.string().min(2).required().messages({
+    "string.empty": "Username is required",
   }),
 
   email: Joi.string()
@@ -61,8 +56,7 @@ const signUpSchema = Joi.object<FormData>({
 const SignUp: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     phoneNumber: "",
-    firstName: "",
-    lastName: "",
+    username: "",
     email: "",
     password: "",
   });
@@ -70,7 +64,7 @@ const SignUp: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<Partial<FormData & { confirmPassword: string }>>({});
   const [loading, setLoading] = useState(false);
-
+  const [message, setMessage] = useState<string>()
   /* ===================== HANDLERS ===================== */
   const handleFormChange = (key: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -108,7 +102,7 @@ const SignUp: React.FC = () => {
       });
 
       const data = await response.json();
-
+      setMessage(data?.message);
       if (!response.ok) {
         console.error("Registration failed:", data?.message);
       } else {
@@ -151,7 +145,7 @@ const SignUp: React.FC = () => {
           <Text className="text-center text-[16px] mb-6">
             Let’s get you started 🚀
           </Text>
-
+          <Text>{message}</Text>
           {/* Phone */}
           <CountrySelectWithInput
             value={formData.phoneNumber}
@@ -168,25 +162,16 @@ const SignUp: React.FC = () => {
               action={(v: string) => handleFormChange("email", v)}
               icon="mail"
               error={error.email}
-               name=""
+               name="mail"
             />
 
             <InputFields
-              placeHolder="First name"
-              value={formData.firstName}
-              action={(v: string) => handleFormChange("firstName", v)}
+              placeHolder="Username"
+              value={formData.username}
+              action={(v: string) => handleFormChange("username", v)}
               icon="person"
-              error={error.firstName}
-              name=""
-            />
-
-            <InputFields
-              placeHolder="Last name"
-              value={formData.lastName}
-              action={(v: string) => handleFormChange("lastName", v)}
-              icon="person"
-              error={error.lastName}
-               name=""
+              error={error.username}
+              name="username"
             />
 
             <InputFields
@@ -196,7 +181,7 @@ const SignUp: React.FC = () => {
               icon="key"
               // secureTextEntry
               error={error.password}
-               name=""
+               name="passwork"
             />
 
             <InputFields
@@ -205,7 +190,7 @@ const SignUp: React.FC = () => {
               action={(v: string) => setConfirmPassword(v)}
               icon="key"
               // secureTextEntry
-               name=""
+               name="cpsw"
               error={error.confirmPassword}
             />
           </View>
@@ -226,7 +211,7 @@ const SignUp: React.FC = () => {
             <Text className="text-gray-500 text-sm">
               Already have an account?
             </Text>
-            <Link href="/" className="underline text-[#1EBA8D] text-sm">
+            <Link href="/signin" className="underline text-[#1EBA8D] text-sm">
               Login
             </Link>
           </View>

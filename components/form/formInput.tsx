@@ -32,10 +32,12 @@ export const InputFields: React.FC<InputFieldsProps> = ({
       ) : null}
 
 <View
-  className="flex justify-between items-center flex-row py-1 px-8  rounded-full"
+  className="flex justify-between items-center flex-row  rounded-full"
   style={{
     borderWidth: 2,
     borderColor: error.trim() !== "" ? "#F87171" : "#E9EAEB",
+    height:50,
+    paddingHorizontal:25
   }}
 >
 

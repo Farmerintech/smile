@@ -1,4 +1,4 @@
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import Joi from "joi";
 import React, { useState } from "react";
 import {
@@ -13,6 +13,7 @@ import {
 import { InputFields } from "@/components/form/formInput";
 import "../../global.css";
 import { BaseURL } from "../lib/api";
+import { useAppStore } from "../store/useAppStore";
 
 /* ===================== TYPES ===================== */
 interface FormData {
@@ -48,6 +49,7 @@ const SignIn: React.FC = () => {
 
   const [error, setError] = useState<Partial<FormData>>({});
   const [loading, setLoading] = useState(false);
+      const {setUser} = useAppStore();
 
   /* ===================== HANDLERS ===================== */
   const handleFormChange = (key: keyof FormData, value: string) => {
@@ -93,7 +95,13 @@ const SignIn: React.FC = () => {
       });
 
       const data = await response.json();
-
+      setUser({
+        username:data.username,
+        email:data.username,
+        isLoggedIn:true,
+        token:data.token
+      })
+      router.push("/(tabs)/home");
       if (!response.ok) {
         console.error("Login failed:", data?.message);
       } else {
