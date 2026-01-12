@@ -88,6 +88,13 @@ export default function RootLayout() {
         headerTitle: '',
 
         }} />
+         <Stack.Screen name="changePsw" 
+        options={{
+          headerShown: false,
+          headerShadowVisible: false,
+        headerTitle: '',
+
+        }} />
         <Stack.Screen name="otp" 
         options={{
           headerShown: false,

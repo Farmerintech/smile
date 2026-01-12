@@ -1,7 +1,9 @@
 import { Item } from "@/components/settings";
+import { router } from "expo-router";
 import { View } from "react-native";
-
+import { useAppStore } from "./store/useAppStore";
 const Account: React.FC = () => {
+ const {user} = useAppStore()
  
  return (
     <View
@@ -13,10 +15,10 @@ const Account: React.FC = () => {
         overflow: "scroll",
       }}
     >
-      <Item icon="person" label="Yakub" />
-      <Item icon="mail" label="farmerintech@gmail.com" />
-      <Item icon="key" label="Change password" />
-      <Item icon="call" label="Change number" />
+      <Item icon="person" label={user.username} />
+      <Item icon="mail" label={user.email} />
+      <Item icon="key" label="Change password" onPress={()=>router.push("/(auth)/changePsw")}/>
+      <Item icon="call" label="Change number" onPress={()=>router.push("/(auth)/changeNumber")}/>
       <Item icon="wallet" label="Payment methods"  />
       <Item icon="settings" label="support"  />
     </View>

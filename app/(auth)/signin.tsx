@@ -11,6 +11,7 @@ import {
 } from "react-native";
 
 import { InputFields } from "@/components/form/formInput";
+import { NotificationBar } from "@/components/NotificationBar";
 import "../../global.css";
 import { BaseURL } from "../lib/api";
 import { useAppStore } from "../store/useAppStore";
@@ -49,6 +50,7 @@ const SignIn: React.FC = () => {
 
   const [error, setError] = useState<Partial<FormData>>({});
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string>("")
       const {setUser} = useAppStore();
 
   /* ===================== HANDLERS ===================== */
@@ -75,15 +77,16 @@ const SignIn: React.FC = () => {
     error.details.forEach((detail) => {
       const key = detail.path[0] as keyof FormData;
       newErrors[key] = detail.message;
+      setMessage(detail.message)
     });
-
+    
     setError(newErrors);
     return false;
   };
 
   const handleSubmit = async () => {
     if (!validate()) return;
-
+  
     setLoading(true);
     try {
       const response = await fetch(`${BaseURL}/auth/login`, {
@@ -95,13 +98,17 @@ const SignIn: React.FC = () => {
       });
 
       const data = await response.json();
-      setUser({
-        username:data.username,
-        email:data.username,
+      
+      setMessage(data?.message)
+      if(response.ok){
+        setUser({
+        username:data.user.username,
+        email:data.user.email,
         isLoggedIn:true,
-        token:data.token
+        token:data.user.token
       })
-      router.push("/(tabs)/home");
+        router.push("/(tabs)/home");
+      }
       if (!response.ok) {
         console.error("Login failed:", data?.message);
       } else {
@@ -114,12 +121,18 @@ const SignIn: React.FC = () => {
       setLoading(false);
     }
   };
-
+const now = new Date().getTime()
+console.log(now)
   /* ===================== UI ===================== */
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#093131" }}>
       <StatusBar barStyle="light-content" />
-
+      {
+        message!=='' && (
+          <NotificationBar trigger={now} 
+      text={message}/>
+        )
+      }
       {/* Top Section */}
       <View
         style={{
