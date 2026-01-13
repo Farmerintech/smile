@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "smile",
+    "name": "Smile",
     "slug": "smile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/cart.png",
     "scheme": "smile",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -14,15 +14,11 @@
     },
 
     "android": {
+      "package": "com.farmerintech.smile",
       "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "config": {
-        "googleMaps": {
-          "apiKey": "YOUR_GOOGLE_MAPS_API_KEY"
-        }
       }
     },
 
@@ -36,17 +32,15 @@
       "expo-router",
       "expo-secure-store",
       "expo-font",
-
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/image-2.png",
+          "image": "./assets/images/cart.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "orange"
+          "backgroundColor": "#093131"
         }
       ],
-
       [
         "expo-notifications",
         {
@@ -63,6 +57,15 @@
 
     "experiments": {
       "typedRoutes": true
-    }
+    },
+
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "283b5794-dc09-4616-8cc9-91ffc579cd54"
+      }
+    },
+
+    "owner": "farmerintech"
   }
 }

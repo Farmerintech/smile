@@ -1,8 +1,7 @@
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Tabs, useRouter } from 'expo-router';
-import React from 'react';
-import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Platform, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../_layout';
 import { useAppStore } from '../store/useAppStore';
@@ -72,7 +71,7 @@ export default function TabLayout() {
               >
                 <View className="flex-row items-center justify-between mb-2"
                 style={{ gap: 10 }}>
-                {/* <Image
+                <Image
             source={yakub}
             style={{
               width: 50,
@@ -85,11 +84,11 @@ export default function TabLayout() {
               shadowOpacity: 0.3,
               shadowRadius: 5,
             }}
-          /> */}
+          />
                 {/* Greeting */}
                 <View>
                   <AppText
-                    className="text-[20px] font-bold"
+                    className="text-[16px] font-bold"
                     style={{ color: "#1A1A1A" }}
                   >
                     Hello, {user?.username} 👋

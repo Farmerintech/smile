@@ -1,17 +1,19 @@
 import CountrySelectWithInput from "@/components/countries";
 import { InputFields } from "@/components/form/formInput";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import Joi from "joi";
 import React, { useState } from "react";
 import {
+  Platform,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
+import { NotificationBar } from "@/components/NotificationBar";
 import "../../global.css";
 import { BaseURL } from "../lib/api";
 
@@ -62,32 +64,38 @@ const SignUp: React.FC = () => {
   });
 
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState<Partial<FormData & { confirmPassword: string }>>({});
+  const [error, setError] = useState<
+    Partial<FormData & { confirmPassword: string }>
+  >({});
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string>()
-  /* ===================== HANDLERS ===================== */
+  const [message, setMessage] = useState<string>("");
+  const [showNotification, setShowNotification] = useState(false);
+
   const handleFormChange = (key: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
     if (error[key]) setError((prev) => ({ ...prev, [key]: "" }));
   };
 
   const validate = (): boolean => {
-    const { error } = signUpSchema.validate(formData, { abortEarly: false });
+    const { error } = signUpSchema.validate(formData, {
+      abortEarly: false,
+    });
 
-    const newErrors: any = {};
-
-    if (error) {
-      error.details.forEach((detail) => {
-        newErrors[detail.path[0]] = detail.message;
-      });
+    if (!error) {
+      setError({});
+      return true;
     }
 
-    if (formData.password !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
+    const newErrors: Partial<FormData> = {};
+    error.details.forEach((detail) => {
+      const key = detail.path[0] as keyof FormData;
+      newErrors[key] = detail.message;
+    });
 
     setError(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setMessage(Object.values(newErrors)[0]); // show first error in notification
+    setShowNotification(true);
+    return false;
   };
 
   const handleSubmit = async () => {
@@ -103,13 +111,16 @@ const SignUp: React.FC = () => {
 
       const data = await response.json();
       setMessage(data?.message);
+            setShowNotification(true);
       if (!response.ok) {
         console.error("Registration failed:", data?.message);
       } else {
         console.log("Registration successful:", data);
+        router.push("/signin")
       }
     } catch (err) {
       console.error("Network error:", err);
+            setShowNotification(true);
     } finally {
       setLoading(false);
     }
@@ -118,8 +129,14 @@ const SignUp: React.FC = () => {
   /* ===================== UI ===================== */
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#093131" }}>
-      <StatusBar barStyle="light-content" />
-
+      <StatusBar barStyle="light-content" backgroundColor={"#093131"} />
+{message !== "" && showNotification && (
+        <NotificationBar
+          trigger={showNotification}
+          text={message}
+          onHide={() => setShowNotification(false)}
+        />
+      )}
       {/* Top */}
       <View style={{ flex: 1, justifyContent: "flex-end", paddingHorizontal: 24 }}>
         <Text className="text-[48px] font-bold text-white text-center mb-2">
@@ -130,7 +147,7 @@ const SignUp: React.FC = () => {
       {/* Bottom */}
       <View
         style={{
-          flex: 3,
+          flex: 4,
           backgroundColor: "#FFF",
           borderTopLeftRadius: 32,
           borderTopRightRadius: 32,
@@ -138,7 +155,12 @@ const SignUp: React.FC = () => {
           paddingTop: 32,
         }}
       >
-        <ScrollView keyboardShouldPersistTaps="handled">
+        <KeyboardAwareScrollView
+          enableOnAndroid={true}
+          extraScrollHeight={Platform.OS === "ios" ? 20 : 50}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
           <Text className="text-[30px] font-bold text-center mb-2">
             Create Account
           </Text>
@@ -146,12 +168,11 @@ const SignUp: React.FC = () => {
             Let’s get you started 🚀
           </Text>
           <Text>{message}</Text>
+
           {/* Phone */}
           <CountrySelectWithInput
             value={formData.phoneNumber}
-            onChange={(text: string) =>
-              handleFormChange("phoneNumber", text)
-            }
+            onChange={(text: string) => handleFormChange("phoneNumber", text)}
             error={error.phoneNumber}
           />
 
@@ -162,7 +183,7 @@ const SignUp: React.FC = () => {
               action={(v: string) => handleFormChange("email", v)}
               icon="mail"
               error={error.email}
-               name="mail"
+              name="mail"
             />
 
             <InputFields
@@ -179,9 +200,8 @@ const SignUp: React.FC = () => {
               value={formData.password}
               action={(v: string) => handleFormChange("password", v)}
               icon="key"
-              // secureTextEntry
               error={error.password}
-               name="passwork"
+              name="password"
             />
 
             <InputFields
@@ -189,9 +209,8 @@ const SignUp: React.FC = () => {
               value={confirmPassword}
               action={(v: string) => setConfirmPassword(v)}
               icon="key"
-              // secureTextEntry
-               name="cpsw"
               error={error.confirmPassword}
+              name="cpsw"
             />
           </View>
 
@@ -215,7 +234,7 @@ const SignUp: React.FC = () => {
               Login
             </Link>
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </View>
     </SafeAreaView>
   );

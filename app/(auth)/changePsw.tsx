@@ -46,6 +46,8 @@ const ChangePSW = () =>{
     const [error, setError] = useState<Partial<passwordData>>({});
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<string>("")
+      const [showNotification, setShowNotification] = useState(false);
+
         const {setUser} = useAppStore();
   
     /* ===================== HANDLERS ===================== */
@@ -57,27 +59,28 @@ const ChangePSW = () =>{
       }
     };
   
-    const validate = (): boolean => {
-      const { error } = passwordSchema.validate(pswFormData, {
-        abortEarly: false,
-      });
-  
-      if (!error) {
-        setError({});
-        return true;
-      }
-  
-      const newErrors: Partial<passwordData> = {};
-  
-      error.details.forEach((detail) => {
-        const key = detail.path[0] as keyof passwordData;
-        newErrors[key] = detail.message;
-        setMessage(detail.message)
-      });
-      
-      setError(newErrors);
-      return false;
-    };
+  const validate = (): boolean => {
+    const { error } = passwordSchema.validate(pswFormData, {
+      abortEarly: false,
+    });
+
+    if (!error) {
+      setError({});
+      return true;
+    }
+
+    const newErrors: Partial<passwordData> = {};
+    error.details.forEach((detail) => {
+      const key = detail.path[0] as keyof passwordData;
+      newErrors[key] = detail.message;
+    });
+
+    setError(newErrors);
+    setMessage(Object.values(newErrors)[0]); // show first error in notification
+    setShowNotification(true);
+    return false;
+  };
+
   
 const handleSubmit = async () => {
   if (!validate()) return;
@@ -116,12 +119,13 @@ const handleSubmit = async () => {
     return(
     <SafeAreaView style={{ flex: 1, backgroundColor: "#093131" }}>
       <StatusBar barStyle="light-content" />
-      {
-        message!=='' && (
-          <NotificationBar trigger={now} 
-      text={message}/>
-        )
-      }
+       {message !== "" && showNotification && (
+        <NotificationBar
+          trigger={showNotification}
+          text={message}
+          onHide={() => setShowNotification(false)}
+        />
+      )}
       {/* Top Section */}
       <View
         style={{

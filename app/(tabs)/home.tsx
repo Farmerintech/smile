@@ -1,5 +1,6 @@
 import { CartModal } from "@/components/cartModal";
 import { data } from "@/components/data";
+import LoginGuard from "@/components/loginGuard";
 import { registerForPushNotificationsAsync } from "@/hooks/notifications";
 import { useStatusBar } from "@/hooks/statusBar";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
@@ -137,7 +138,7 @@ const { addToCart } = useAppStore();
  useStatusBar("white", "dark-content");
 
   return (
-    <>
+    <LoginGuard>
      <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
   <ScrollView
   showsVerticalScrollIndicator={false}
@@ -438,7 +439,7 @@ const { addToCart } = useAppStore();
           onAddToCart={handleAddToCart}
         />
       )}
-    </>
+    </LoginGuard>
   );
 };
 

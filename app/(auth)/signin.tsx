@@ -50,8 +50,10 @@ const SignIn: React.FC = () => {
 
   const [error, setError] = useState<Partial<FormData>>({});
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string>("")
-      const {setUser} = useAppStore();
+  const [message, setMessage] = useState<string>("");
+  const [showNotification, setShowNotification] = useState(false);
+
+  const { setUser } = useAppStore();
 
   /* ===================== HANDLERS ===================== */
   const handleFormChange = (key: keyof FormData, value: string) => {
@@ -73,74 +75,66 @@ const SignIn: React.FC = () => {
     }
 
     const newErrors: Partial<FormData> = {};
-
     error.details.forEach((detail) => {
       const key = detail.path[0] as keyof FormData;
       newErrors[key] = detail.message;
-      setMessage(detail.message)
     });
-    
+
     setError(newErrors);
+    setMessage(Object.values(newErrors)[0]); // show first error in notification
+    setShowNotification(true);
     return false;
   };
 
   const handleSubmit = async () => {
     if (!validate()) return;
-  
+
     setLoading(true);
     try {
       const response = await fetch(`${BaseURL}/auth/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       const data = await response.json();
-      
-      setMessage(data?.message)
-      if(response.ok){
+
+      setMessage(data?.message || "");
+      setShowNotification(true);
+
+      if (response.ok) {
         setUser({
-        username:data.user.username,
-        email:data.user.email,
-        isLoggedIn:true,
-        token:data.user.token
-      })
+          username: data.user.username,
+          email: data.user.email,
+          isLoggedIn: true,
+          token: data.user.token,
+        });
         router.push("/(tabs)/home");
       }
-      if (!response.ok) {
-        console.error("Login failed:", data?.message);
-      } else {
-        console.log("Login success:", data);
-        // navigate or save token here
-      }
     } catch (err) {
-      console.error("Network error:", err);
+      setMessage("Network error. Please try again.");
+      setShowNotification(true);
     } finally {
       setLoading(false);
     }
   };
-const now = new Date().getTime()
-console.log(now)
+
   /* ===================== UI ===================== */
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#093131" }}>
-      <StatusBar barStyle="light-content" />
-      {
-        message!=='' && (
-          <NotificationBar trigger={now} 
-      text={message}/>
-        )
-      }
+      <StatusBar barStyle="light-content" backgroundColor={"#093131"} />
+
+      {/* Notification */}
+      {message !== "" && showNotification && (
+        <NotificationBar
+          trigger={showNotification}
+          text={message}
+          onHide={() => setShowNotification(false)}
+        />
+      )}
+
       {/* Top Section */}
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "flex-end",
-          paddingHorizontal: 24,
-        }}
-      >
+      <View style={{ flex: 1, justifyContent: "flex-end", paddingHorizontal: 24 }}>
         <Text className="text-[48px] font-bold text-white text-center mb-2">
           Smile
         </Text>
@@ -175,9 +169,7 @@ console.log(now)
               label=""
               placeHolder="Email"
               value={formData.email}
-              action={(value: string) =>
-                handleFormChange("email", value)
-              }
+              action={(value: string) => handleFormChange("email", value)}
               name="email"
               icon="mail"
               error={error.email}
@@ -188,9 +180,7 @@ console.log(now)
               label=""
               placeHolder="Password"
               value={formData.password}
-              action={(value: string) =>
-                handleFormChange("password", value)
-              }
+              action={(value: string) => handleFormChange("password", value)}
               name="password"
               icon="key"
               // secureTextEntry

@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 
 import { useStatusBar } from "@/hooks/statusBar";
+import { router } from "expo-router";
 import {
   Image,
   ScrollView,
@@ -13,6 +14,7 @@ import {
 } from "react-native";
 import "../../global.css";
 import { AppTextBold } from "../_layout";
+import { useAppStore } from "../store/useAppStore";
 interface FormData {
   phoneNumber: string
 }
@@ -68,12 +70,11 @@ const SignIn: React.FC = () => {
   };
 
  useStatusBar("#093131", "light-content");  
- 
+ const {user} = useAppStore()
  return (
     <View style={{ flex: 1, backgroundColor: "#093131", paddingTop:30 }}>
 
           {/* <StatusBar backgroundColor={"#093131"} barStyle={"light-content"}/> */}
-
       {/* Top 25% */}
       <View style={{ flex: 0.5, justifyContent: "flex-start", alignItems:"center", paddingHorizontal: 24}}>
         
@@ -84,7 +85,7 @@ const SignIn: React.FC = () => {
         </View>
       </View>
       <View className="flex items-center flex-row justify-between px-5 mb-5">
-       <View className="flex flex-row items-center justify-start gap-3 ">
+       <View className="flex flex-1 flex-row items-center justify-start gap-3 ">
          <View className="">
               <Image
             source={yakub}
@@ -101,14 +102,14 @@ const SignIn: React.FC = () => {
             }}
           />
         </View>
-        <View className="flex items-start">
+        <View className="flex items-start flex-wrap flex-1">
           <AppTextBold className="text-[28px] text-white text-center mb-2">
-          Yakub
+           {user.username}
         </AppTextBold>
-        <Text className="text-white">Shakirudeen Olaide</Text>
+        <Text className="text-white text-[12px]">{user.email}</Text>
         </View>
        </View>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={()=>router.push("/(auth)/account")}>
           <Ionicons name="chevron-forward" size={25} color="#FF6B35"/>
         </TouchableOpacity>
       </View>

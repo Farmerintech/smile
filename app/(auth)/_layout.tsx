@@ -92,7 +92,33 @@ export default function RootLayout() {
         options={{
           headerShown: false,
           headerShadowVisible: false,
-        headerTitle: '',
+        headerTitle: 'Change Password',
+
+        }} />
+       <Stack.Screen
+  name="account"
+  options={{
+    headerShown: true,
+    headerShadowVisible: false,
+    headerStyle: {
+      backgroundColor: "#093131", // header background
+    },
+    headerTintColor: "white", // back button & title color
+    headerTitle: () => (
+      <View>
+        <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>
+          My Account
+        </Text>
+      </View>
+    ),
+  }}
+/>
+
+          <Stack.Screen name="changeNumber" 
+        options={{
+          headerShown: false,
+          headerShadowVisible: false,
+        headerTitle: 'Change Number',
 
         }} />
         <Stack.Screen name="otp" 

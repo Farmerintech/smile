@@ -1,34 +1,60 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { Animated, Text, View } from "react-native";
 
-export const NotificationBar = ({ text, trigger }: { text: string, trigger: any }) => {
-  const [show, setShow] = useState<boolean>(false);
-  
- useEffect(() => {
-  if (trigger) {
-    setShow(true);
-    const timer = setTimeout(() => {
-      setShow(false);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }
-}, [trigger]);
+interface NotificationBarProps {
+  text: string;
+  trigger: boolean;
+  onHide?: () => void; // callback after hiding
+}
+
+export const NotificationBar = ({ text, trigger, onHide }: NotificationBarProps) => {
+  const [show, setShow] = useState(false);
+  const fadeAnim = useState(new Animated.Value(0))[0];
+
+  useEffect(() => {
+    if (trigger) {
+      setShow(true);
+
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+
+      const timer = setTimeout(() => {
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }).start(() => {
+          setShow(false);
+          onHide?.(); // notify parent that it's hidden
+        });
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [trigger]);
+
+  if (!show) return null;
 
   return (
-    show && (
-      <View className="w-[100%] px-[14px] absolute top-100 left-0 pt-5 z-10">
-        <View className="px-[16px] py-[10px] bg-white/10 w-[100%] flex items-center gap-[8px] 
-        rounded-[6px] border-1 border-white flex-row">
-          <Ionicons
-            name={'notifications-outline'}
-            size={25}
-            color="#22AD5C"
-            style={{ marginRight: 8 }}
-          />
-          <Text className="text-[#294736] font-[500] text-gray-400">{text}</Text>
-        </View>
+    <Animated.View
+      style={{
+        position: "absolute",
+        top: 50,
+        left: 0,
+        right: 0,
+        zIndex: 999,
+        opacity: fadeAnim,
+        paddingHorizontal: 14,
+      }}
+    >
+      <View className="flex-row items-center flex flex-row items-center justify-center  gap-2 px-4 py-2 bg-[#1EBA8D] py-2 rounded-xl">
+        <Ionicons name="notifications-outline" size={25} color="white" />
+        <Text className="text-white font-medium">{text}</Text>
       </View>
-    )
+    </Animated.View>
   );
 };

@@ -102,10 +102,10 @@ useEffect(() => {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
           <Stack>
+            <Stack.Screen name="(tabs)" options={screenOptions} />
             <Stack.Screen name="(onboarding)" options={screenOptions} />
             <Stack.Screen name="(auth)" options={screenOptions} />
             <Stack.Screen name="splash" options={screenOptions} />
-            <Stack.Screen name="(tabs)" options={screenOptions} />
           </Stack>
         </ThemeProvider>
       </QueryClientProvider>

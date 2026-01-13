@@ -42,39 +42,40 @@ const ChangeNumber = () =>{
     const [error, setError] = useState<Partial<numberData>>({});
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<string>("")
-        const {setUser} = useAppStore();
+    const {setUser} = useAppStore();
+    const [showNotification, setShowNotification] = useState(false);
   
     /* ===================== HANDLERS ===================== */
     const handlePswFormChange = (key: keyof numberData, value: string) => {
       setNumberData((prev) => ({ ...prev, [key]: value }));
   
-    //   if (error[key]) {
-    //     setError((prev) => ({ ...prev, [key]: "" }));
-    //   }
-    //    setError({});
-    };
-  
-    const validate = (): boolean => {
-      const { error } = numberSchema.validate(numberFormData, {
-        abortEarly: false,
-      });
-  
-      if (!error) {
-        setError({});
-        return true;
+      if (error[key]) {
+        setError((prev) => ({ ...prev, [key]: "" }));
       }
-  
-      const newErrors: Partial<numberData> = {};
-  
-      error.details.forEach((detail) => {
-        const key = detail.path[0] as keyof numberData;
-        newErrors[key] = detail.message;
-        setMessage(detail.message)
-      });
-      
-      setError(newErrors);
-      return false;
+       setError({});
     };
+  
+  const validate = (): boolean => {
+    const { error } = numberSchema.validate(numberFormData, {
+      abortEarly: false,
+    });
+
+    if (!error) {
+      setError({});
+      return true;
+    }
+
+    const newErrors: Partial<numberData> = {};
+    error.details.forEach((detail) => {
+      const key = detail.path[0] as keyof numberData;
+      newErrors[key] = detail.message;
+    });
+
+    setError(newErrors);
+    setMessage(Object.values(newErrors)[0]); // show first error in notification
+    setShowNotification(true);
+    return false;
+  };
   
 const handleSubmit = async () => {
   if (!validate()) return;
@@ -111,12 +112,13 @@ const handleSubmit = async () => {
     return(
     <SafeAreaView style={{ flex: 1, backgroundColor: "#093131" }}>
       <StatusBar barStyle="light-content" />
-      {
-        message!=='' && (
-          <NotificationBar trigger={now} 
-      text={message}/>
-        )
-      }
+       {message !== "" && showNotification && (
+              <NotificationBar
+                trigger={showNotification}
+                text={message}
+                onHide={() => setShowNotification(false)}
+              />
+            )}
       {/* Top Section */}
       <View
         style={{
