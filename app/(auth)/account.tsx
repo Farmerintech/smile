@@ -1,11 +1,9 @@
 import { Item } from "@/components/settings";
-import { useStatusBar } from "@/hooks/statusBar";
 import { router } from "expo-router";
-import { View } from "react-native";
+import { StatusBar, View } from "react-native";
 import { useAppStore } from "../store/useAppStore";
 const Account: React.FC = () => {
  const {user} = useAppStore()
-  useStatusBar("#093131", "light-content");  
  
  return (
     <View
@@ -17,6 +15,7 @@ const Account: React.FC = () => {
         overflow: "scroll",
       }}
     >
+      <StatusBar backgroundColor={'"#093131"'} barStyle={"light-content"}/>
       
       <Item icon="person" label={user.username} />
       <Item icon="mail" label={user.email} />

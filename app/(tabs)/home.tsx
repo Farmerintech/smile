@@ -123,8 +123,11 @@ const { addToCart } = useAppStore();
   await Notifications.scheduleNotificationAsync({
     content: {
       title: `Cart Updated`,
-      body: `${selectedItem.name} added to cart- ${itemCounts[selectedItem.storeId]}`,
-      sound: "default"
+      body: `${selectedItem.name} added to cart`,
+      sound: "default",
+         data: {
+        url: `/orders` // deep link to a route in your app
+      },
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
