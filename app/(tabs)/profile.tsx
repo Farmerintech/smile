@@ -109,7 +109,7 @@ const SignIn: React.FC = () => {
         <Text className="text-white text-[12px]">{user.email}</Text>
         </View>
        </View>
-        <TouchableOpacity onPress={()=>router.push("/(auth)/account")}>
+        <TouchableOpacity onPress={()=>router.push("/(screens)/account")}>
           <Ionicons name="chevron-forward" size={25} color="#FF6B35"/>
         </TouchableOpacity>
       </View>

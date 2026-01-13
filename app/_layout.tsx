@@ -1,5 +1,5 @@
 import { setupFocusManager } from "@/app/lib/focusManager";
-import { setupOnlineManager } from "@/app/lib/onlineManager";
+import setupOnlineManager from "@/app/lib/onlineManager";
 import { queryClient } from "@/app/lib/queryClient";
 import { useAppStore } from "@/app/store/useAppStore";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -106,6 +106,7 @@ useEffect(() => {
             <Stack.Screen name="(onboarding)" options={screenOptions} />
             <Stack.Screen name="(auth)" options={screenOptions} />
             <Stack.Screen name="splash" options={screenOptions} />
+            <Stack.Screen name="(screens)" options={screenOptions} />
           </Stack>
         </ThemeProvider>
       </QueryClientProvider>

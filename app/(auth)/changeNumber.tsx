@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import Joi from "joi";
 import { useState } from "react";
 import { SafeAreaView, ScrollView, StatusBar, Text, TouchableOpacity, View } from "react-native";
+import { AppText, AppTextBold } from "../_layout";
 import { apiRequest, BaseURL } from "../lib/api";
 import { useAppStore } from "../store/useAppStore";
 
@@ -127,9 +128,9 @@ const handleSubmit = async () => {
           paddingHorizontal: 24,
         }}
       >
-        <Text className="text-[48px] font-bold text-white text-center mb-2">
+        <AppTextBold className="text-[48px] font-bold text-white text-center mb-2">
           Smile
-        </Text>
+        </AppTextBold>
         <Text className="text-[#CFEDEA] text-center text-[14px]" />
       </View>
 
@@ -148,12 +149,12 @@ const handleSubmit = async () => {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <Text className="text-[30px] font-bold text-center mb-2">
+          <AppTextBold className="text-[20px] font-[700] text-center mb-2">
             Hello, {user.username}
-          </Text>
-          <Text className="text-center text-[18px] mb-6">
-            Let’s get your password changed in no time👋
-          </Text>
+          </AppTextBold>
+          <AppText className="text-center mb-6">
+            Let’s get your number chnaged
+          </AppText>
 
           <View className="flex flex-col gap-4">
             {/* Email */}

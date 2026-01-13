@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import {
   Image,
   ScrollView,
@@ -27,6 +28,12 @@ const removeItem = async (id: string) => {
   await removeFromCart(id);
 };
 
+const checkOut = async () =>{
+  cart.forEach(async item => {
+      await removeFromCart(item.id);
+  });
+  router.push("/(screens)/trackOrder")
+}
   return (
     <View style={{ flex: 1, backgroundColor: "white", paddingBottom: 160, }}>
       <ScrollView
@@ -125,7 +132,7 @@ const removeItem = async (id: string) => {
             <AppText className="font-bold">₦{total}</AppText>
           </View>
 
-          <TouchableOpacity className="bg-[#093131] py-4 rounded-[16px] items-center">
+          <TouchableOpacity className="bg-[#093131] py-4 rounded-[16px] items-center" onPress={()=>checkOut()}>
             <AppText className="text-white font-semibold text-[16px]">
               Checkout ₦{total}
             </AppText>

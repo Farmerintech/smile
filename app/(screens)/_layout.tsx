@@ -22,7 +22,19 @@ const router = useRouter()
       
       >
         {/* Account Screen */}
-        <Stack.Screen name="errandDetails" 
+  <Stack.Screen name="trackOrder" 
+  options={{
+    headerShown: true,
+    headerShadowVisible: true,
+    headerTitle: "Trcak Order",
+    headerLeft: () => (
+      <TouchableOpacity  onPress={() => router.back()} style={{ paddingHorizontal: 10 }}>
+        <MaterialIcons name="chevron-left" size={28} />
+      </TouchableOpacity>
+    ),
+  }}
+/> 
+  <Stack.Screen name="account" 
   options={{
     headerShown: true,
     headerShadowVisible: false,
@@ -34,7 +46,6 @@ const router = useRouter()
     ),
   }}
 /> 
-
       </Stack>
 
       <StatusBar style="auto" />
