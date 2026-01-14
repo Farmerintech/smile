@@ -1,7 +1,7 @@
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Tabs, useRouter } from 'expo-router';
-import { Image, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../_layout';
 import { useAppStore } from '../store/useAppStore';
@@ -27,25 +27,18 @@ export default function TabLayout() {
         tabBarInactiveTintColor: 'gray',
 
         // Background of the tab bar
-        tabBarBackground: () => (
-          <View
-            className="bg-white shadow-md shadow-black/10"
-            style={{
-              flex: 1,
-              borderTopWidth: Platform.OS === "android" ? 0 : 0,
-            }}
-          />
-          
-        ),
-    //     tabBarStyle: {
-      
-    //   height: 80,   
-    //   paddingTop:5,          // fixed height
-    //   paddingBottom: 0,       // remove extra insets
-    //   borderTopWidth: 0,      // optional
-    //   backgroundColor: 'white', // optional
-    //   elevation: 5,           // shadow for Android
-    // },
+tabBarStyle: {
+  height: 70,                 // fixed height
+  paddingBottom: insets.bottom || 0, // use safe area inset
+  backgroundColor: 'white',
+  borderTopWidth: 0,
+  elevation: 5,
+  shadowColor: '#000',
+  shadowOpacity: 0.1,
+  shadowRadius: 5,
+  shadowOffset: { width: 0, height: 3 },
+},
+tabBarBackground: undefined, // remove the custom flex:1 View
         tabBarLabelStyle: {
           fontSize: 13,
           fontFamily:'Inter_700Bold' ,

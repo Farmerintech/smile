@@ -113,11 +113,19 @@ const { addToCart } = useAppStore();
   
 
 
-  useEffect(() => {
-  registerForPushNotificationsAsync().then((token) => {
-    console.log("TOKEN FROM SCREEN:", token);
-  });
+useEffect(() => {
+  (async () => {
+    try {
+      const token = await registerForPushNotificationsAsync();
+      if (token) {
+        console.log("TOKEN FROM SCREEN:", token);
+      }
+    } catch (err) {
+      console.log("Push registration failed:", err);
+    }
+  })();
 }, []);
+
 
   async function sendTestNotification() {
   await Notifications.scheduleNotificationAsync({
