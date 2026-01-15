@@ -4,6 +4,7 @@ import { useFonts } from 'expo-font';
 import { Stack, useRouter } from 'expo-router';
 import React from 'react';
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import "../../global.css";
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 

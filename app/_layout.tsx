@@ -2,28 +2,32 @@ import { setupFocusManager } from "@/app/lib/focusManager";
 import setupOnlineManager from "@/app/lib/onlineManager";
 import { queryClient } from "@/app/lib/queryClient";
 import { useAppStore } from "@/app/store/useAppStore";
+import "@/global.css";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-
 import {
   Inter_400Regular,
   Inter_500Medium,
   Inter_700Bold,
   useFonts,
 } from "@expo-google-fonts/inter";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from "@react-navigation/native";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 
 import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
 
-import { useEffect, useState } from "react";
-import { AppState, Text, TextProps } from "react-native";
+import { useEffect } from "react";
+import { StyleSheet, Text, TextProps, View } from "react-native";
 
 /* ================================
-   🔔 NOTIFICATIONS (GLOBAL)
+   🔔 NOTIFICATIONS
 ================================ */
 
 Notifications.setNotificationHandler({
@@ -36,31 +40,30 @@ Notifications.setNotificationHandler({
 });
 
 /* ================================
-   🔄 REACT QUERY MANAGERS
+   🔄 REACT QUERY
 ================================ */
 
 setupOnlineManager();
 setupFocusManager();
 
 /* ================================
-   🚀 SPLASH SCREEN
+   🚀 SPLASH
 ================================ */
 
 SplashScreen.preventAutoHideAsync();
 
 /* ================================
-   🎨 CONSTANTS
-================================ */
-
-const GREEN = "#093131";
-
-/* ================================
-   🧠 ROOT LAYOUT
+   🧠 ROOT
 ================================ */
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const hydrate = useAppStore((s) => s.hydrate);
+
+  const {
+    hydrate,
+    user,
+    hasCompletedOnboarding,
+  } = useAppStore();
 
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
@@ -68,29 +71,43 @@ export default function RootLayout() {
     Inter_700Bold,
   });
 
-  // Zustand hydration
+  // Hydrate Zustand
   useEffect(() => {
     hydrate();
   }, []);
 
-  // Hide splash screen when app is ready
+  // Hide splash only when EVERYTHING is ready
   useEffect(() => {
     if (fontsLoaded) {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
-const [appState, setAppState] = useState(AppState.currentState);
 
-useEffect(() => {
-  const sub = AppState.addEventListener('change', nextState => {
-    setAppState(nextState);
-  });
-  return () => sub.remove();
-}, []);
-  // Keep splash screen visible until fonts load
-  if (!fontsLoaded) {
-    return null;
-  }
+  // Handle initial routing (BEST PRACTICE)
+  useEffect(() => {
+    if (!fontsLoaded) return;
+
+    if (!hasCompletedOnboarding) {
+      router.replace("/(onboarding)");
+      return;
+    }
+
+    if (!user || !user.email) {
+      router.replace("/(auth)/signin");
+      return;
+    }
+
+    router.replace("/(tabs)/home");
+  }, [fontsLoaded, hasCompletedOnboarding, user]);
+
+if (!fontsLoaded) {
+  return (
+    <View style={styles.loadingContainer}>
+      {/* <Text style={styles.loadingText}>Loading...</Text> */}
+    </View>
+  );
+}
+
 
   const screenOptions = {
     headerShown: false,
@@ -98,14 +115,16 @@ useEffect(() => {
   };
 
   return (
-     <SafeAreaProvider>
+    <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-          <Stack>
-            <Stack.Screen name="(onboarding)" options={screenOptions} />
-            <Stack.Screen name="(tabs)" options={screenOptions} />
-            <Stack.Screen name="(auth)" options={screenOptions} />
-            <Stack.Screen name="(screens)" options={screenOptions} />
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <Stack screenOptions={screenOptions}>
+            <Stack.Screen name="(onboarding)" />
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="(screens)" />
           </Stack>
         </ThemeProvider>
       </QueryClientProvider>
@@ -114,23 +133,28 @@ useEffect(() => {
 }
 
 /* ================================
-   ✍️ GLOBAL TEXT COMPONENTS
+   ✍️ GLOBAL TEXT
 ================================ */
 
-export const AppText: React.FC<TextProps> = ({ style, ...props }) => {
-  return (
-    <Text
-      {...props}
-      style={[{ fontFamily: "Inter_500Medium" }, style]}
-    />
-  );
-};
+export const AppText: React.FC<TextProps> = ({ style, ...props }) => (
+  <Text {...props} style={[{ fontFamily: "Inter_500Medium" }, style]} />
+);
 
-export const AppTextBold: React.FC<TextProps> = ({ style, ...props }) => {
-  return (
-    <Text
-      {...props}
-      style={[{ fontFamily: "Inter_700Bold" }, style]}
-    />
-  );
-};
+export const AppTextBold: React.FC<TextProps> = ({ style, ...props }) => (
+  <Text {...props} style={[{ fontFamily: "Inter_700Bold" }, style]} />
+);
+
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: "#093131", // bright green background
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    color: "#fff",
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+});

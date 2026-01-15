@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import "../../global.css";
 import { AppText } from "../_layout";
 
 const items = [

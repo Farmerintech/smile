@@ -1,8 +1,10 @@
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Tabs, useRouter } from 'expo-router';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect } from 'react';
+import { GestureResponderEvent, Image, StyleProp, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import "../../global.css";
 import { AppText } from '../_layout';
 import { useAppStore } from '../store/useAppStore';
 
@@ -18,33 +20,55 @@ export default function TabLayout() {
     router.push("/order"); // <-- use push, not a direct call
   };
 
-  const {user} = useAppStore()
+// Minimal type for tab bar button props
+type TabBarButtonProps = {
+  accessibilityState?: { selected?: boolean };
+  children?: React.ReactNode;
+  onPress?: ((event: GestureResponderEvent) => void) | undefined;
+  style?: StyleProp<ViewStyle>;
+  delayLongPress?: number | null; // allow null
+  [key: string]: any; // allow any extra props from Tabs
+};
+
+// Usage in screenOptions
+
+
+    const {user} = useAppStore();
+    useEffect(()=>{
+      if(!user || user.email===''){
+        router.push("/(auth)/signin")
+      }
+    })
   return (
     <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: '#093131',
-        tabBarInactiveTintColor: 'gray',
-
-        // Background of the tab bar
-tabBarStyle: {
-  height: 70,                 // fixed height
-  paddingBottom: insets.bottom || 0, // use safe area inset
-  backgroundColor: 'white',
-  borderTopWidth: 0,
-  elevation: 5,
-  shadowColor: '#000',
-  shadowOpacity: 0.1,
-  shadowRadius: 5,
-  shadowOffset: { width: 0, height: 3 },
+screenOptions={{
+  headerShown: false,
+  tabBarActiveTintColor: '#093131',
+  tabBarInactiveTintColor: 'gray',
+  // tabBarStyle: {
+  //   height: 90 ,
+  //   paddingTop: 5,
+  //   paddingBottom:0,
+  //   borderTopWidth: 0,
+  //   backgroundColor: 'white',
+  //   elevation: 5,
+  //   opacity:1,
+  //   shadowColor: '#000',
+  //   shadowOpacity: 0.1,
+  //   shadowRadius: 5,
+  //   shadowOffset: { width: 0, height: 3 },
+  // },
+  tabBarLabelStyle: {
+    fontSize: 13,
+    fontFamily: 'Inter_700Bold',
+    marginBottom: 8,
+  },
+  tabBarBackground: undefined,
+ tabBarButton: (props: TabBarButtonProps) => {
+  const { delayLongPress, ...rest } = props; // remove delayLongPress so TypeScript is happy
+  return <TouchableOpacity {...rest} activeOpacity={1} />;
 },
-tabBarBackground: undefined, // remove the custom flex:1 View
-        tabBarLabelStyle: {
-          fontSize: 13,
-          fontFamily:'Inter_700Bold' ,
-          marginBottom: 8, // ensures label is visible
-        },
-      }}
+}}
     >
       {/* Home */}
       <Tabs.Screen

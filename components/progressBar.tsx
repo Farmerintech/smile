@@ -6,7 +6,7 @@ import CircularProgress from "react-native-circular-progress-indicator";
 interface progressBarProps {
   index: number;
   mylink: any;
-  value: number;
+  value: number
 }
 export const ProgressBar = ({ index, mylink, value }: progressBarProps) => {
   return (

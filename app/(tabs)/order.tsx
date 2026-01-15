@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import "../../global.css";
 import { AppText } from "../_layout";
 import { useAppStore } from "../store/useAppStore";
 const Cart= require("@/assets/images/empty-cart.png")

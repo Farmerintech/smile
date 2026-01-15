@@ -48,9 +48,9 @@ const signUpSchema = Joi.object<FormData>({
       "string.email": "Enter a valid email",
     }),
 
-  password: Joi.string().min(6).required().messages({
+  password: Joi.string().min(8).required().messages({
     "string.empty": "Password is required",
-    "string.min": "Password must be at least 6 characters",
+    "string.min": "Password must be at least 8 characters",
   }),
 });
 
@@ -110,17 +110,20 @@ const SignUp: React.FC = () => {
       });
 
       const data = await response.json();
-      setMessage(data?.message);
-            setShowNotification(true);
-      if (!response.ok) {
-        console.error("Registration failed:", data?.message);
-      } else {
-        console.log("Registration successful:", data);
-        router.push("/signin")
+
+      const msg =
+  Array.isArray(data?.message) ? data.message.join(", ") : String(data?.message);
+
+      console.log(msg)
+      setMessage(msg)
+      setShowNotification(true);
+
+      if (response.ok) {
+        router.push("/(auth)/signin");
       }
     } catch (err) {
-      console.error("Network error:", err);
-            setShowNotification(true);
+      setMessage("Network error. Please try again.");
+      setShowNotification(true);
     } finally {
       setLoading(false);
     }

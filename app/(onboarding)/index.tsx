@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ProgressBar } from '../../components/progressBar';
@@ -9,33 +8,10 @@ interface User {
 }
 
 export default function Index() {
-  const [user, setUser] = useState<User>({ username: '' });
 
   // Retrieve user from AsyncStorage
-  useEffect(() => {
-    const loadUserData = async () => {
-    //   try {
-    //     const userData = await AsyncStorage.getItem('@user_info');
-    //     if (userData) {
-    //       setUser(JSON.parse(userData));
-    //     }
-    //   } catch (error) {
-    //     console.error('Failed to load user data:', error);
-    //   }
-    // #093131
-    // #328264
-    // #083232
-    // #c6D7Cf
-    // #34A979
-    //bg-[#1EBA8D]/20
 
-// Details
-// #1EBA8D
-    };
-
-    loadUserData();
-  }, []);
-
+   
   // Redirect if user exists
 //   if (user.username !== '') return <Redirect href="/rider" />;
 const style = StyleSheet.create({

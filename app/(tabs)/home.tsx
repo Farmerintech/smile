@@ -5,11 +5,16 @@ import { registerForPushNotificationsAsync } from "@/hooks/notifications";
 import { useStatusBar } from "@/hooks/statusBar";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import * as Notifications from "expo-notifications";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import "../../global.css";
+
+import { useFocusEffect, usePathname } from "expo-router";
 import {
+  BackHandler,
   Dimensions,
   FlatList,
   Image,
+  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -147,6 +152,33 @@ useEffect(() => {
 
   const cardWidth = width * 0.45;
  useStatusBar("white", "dark-content");
+ const pathname = usePathname();
+
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS !== "android") return;
+
+      const onBackPress = () => {
+        // If we're on the home tab root
+        if (pathname === "/(tabs)/home") {
+          BackHandler.exitApp(); // minimizes the app
+          return true; // prevent default navigation
+        }
+
+        return false; // allow normal back behavior
+      };
+
+      const sub = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
+
+      return () => sub.remove();
+    }, [pathname])
+  );
+
+ 
+
 
   return (
     <LoginGuard>

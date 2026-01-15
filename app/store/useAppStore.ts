@@ -39,8 +39,11 @@ type AppState = {
   location: LocationType | null;
   loading: boolean;
 
+  hasCompletedOnboarding: boolean;
+
   hydrate: () => Promise<void>;
   setUser: (user: User) => Promise<void>;
+  completeOnboarding: () => Promise<void>;
   addToCart: (item: CartItem) => Promise<void>;
   removeFromCart: (id: string) => Promise<void>;
   setWishlist: (wishlist: Product[]) => Promise<void>;
@@ -66,22 +69,36 @@ export const useAppStore = create<AppState>((set, get) => ({
   location: null,
   loading: true,
 
+  hasCompletedOnboarding: false,
+
+  /* 🔄 HYDRATE STORE */
   hydrate: async () => {
     const cart = await getSecureItem<CartItem[]>("cart");
     const user = await getSecureItem<User>("user");
+    const hasCompletedOnboarding =
+      await getSecureItem<boolean>("hasCompletedOnboarding");
 
     set({
       cart: cart ?? [],
       user: user ?? defaultUser,
+      hasCompletedOnboarding: hasCompletedOnboarding ?? false,
       loading: false,
     });
   },
 
+  /* 👤 USER */
   setUser: async (user) => {
     set({ user });
     await setSecureItem("user", user);
   },
 
+  /* 🚀 ONBOARDING */
+  completeOnboarding: async () => {
+    set({ hasCompletedOnboarding: true });
+    await setSecureItem("hasCompletedOnboarding", true);
+  },
+
+  /* 🛒 CART */
   addToCart: async (item) => {
     const cart = get().cart;
     const existing = cart.find((i) => i.id === item.id);
@@ -102,18 +119,19 @@ export const useAppStore = create<AppState>((set, get) => ({
     await setSecureItem("cart", updatedCart);
   },
 
-  /* ✅ REMOVE ITEM */
   removeFromCart: async (id) => {
     const updatedCart = get().cart.filter((item) => item.id !== id);
     set({ cart: updatedCart });
     await setSecureItem("cart", updatedCart);
   },
 
+  /* ❤️ WISHLIST */
   setWishlist: async (wishlist) => {
     set({ wishlist });
     await setSecureItem("wishlist", wishlist);
   },
 
+  /* 📍 LOCATION */
   refreshLocation: async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") return;
@@ -128,6 +146,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     await setSecureItem("location", location);
   },
 
+  /* 🚪 LOGOUT */
   logout: async () => {
     set({
       user: defaultUser,

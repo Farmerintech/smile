@@ -1,36 +1,30 @@
+import { useAppStore } from "@/app/store/useAppStore";
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ProgressBar } from '../../components/progressBar';
 import "../../global.css";
-interface User {
-  username: string;
-}
+
 
 export default function App() {
-  const [user, setUser] = useState<User>({ username: '' });
 
   // Retrieve user from AsyncStorage
-  useEffect(() => {
-    const loadUserData = async () => {
-    //   try {
-    //     const userData = await AsyncStorage.getItem('@user_info');
-    //     if (userData) {
-    //       setUser(JSON.parse(userData));
-    //     }
-    //   } catch (error) {
-    //     console.error('Failed to load user data:', error);
-    //   }
-    // #093131
-    //bg-[#1EBA8D]/20
+ const completeOnboarding = useAppStore(s => s.completeOnboarding);
+  const hasCompletedOnboarding = useAppStore(s => s.hasCompletedOnboarding);
 
-// Details
-// #1EBA8D
-    };
+  // Complete onboarding only once
+ useEffect(() => {
+  return () => {
+    // This runs when the user LEAVES the onboarding page
+    if (!hasCompletedOnboarding) {
+      completeOnboarding();
+    }
+  };
+}, [hasCompletedOnboarding]);
 
-    loadUserData();
-  }, []);
+
+
 
   // Redirect if user exists
 //   if (user.username !== '') return <Redirect href="/rider" />;

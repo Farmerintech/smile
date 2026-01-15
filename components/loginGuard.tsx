@@ -13,7 +13,7 @@ const LoginGuard: React.FC<Props> = ({ children }) => {
   useEffect(() => {
     if (!user) {
       // if user is not logged in, redirect to login
-      router.replace("/signin"); // or your login route
+      router.replace("/(auth)/signin"); // or your login route
     }
   }, [user, router]);
 

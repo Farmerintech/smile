@@ -3,10 +3,13 @@ import { useFonts } from "expo-font";
 import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
+import "../../global.css";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useEffect } from "react";
 import { TouchableOpacity } from "react-native";
+import { useAppStore } from "../store/useAppStore";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -14,7 +17,13 @@ export default function RootLayout() {
     SpaceMono: require("../../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  if (!loaded) return null;
+  // if (!loaded) return null;
+    const {user} = useAppStore();
+    useEffect(()=>{
+      if(!user || user.email===''){
+        router.push("/(auth)/signin")
+      }
+    })
 const router = useRouter()
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>

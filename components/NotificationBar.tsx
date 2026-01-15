@@ -51,8 +51,8 @@ export const NotificationBar = ({ text, trigger, onHide }: NotificationBarProps)
         paddingHorizontal: 14,
       }}
     >
-      <View className="flex-row items-center flex flex-row items-center justify-center  gap-2 px-4 py-2 bg-[#1EBA8D] py-2 rounded-xl">
-        <Ionicons name="notifications-outline" size={25} color="white" />
+      <View className="flex-row items-center flex flex-row items-center justify-center  gap-2 px-4 py-3  z-10 bg-[#1EBA8D] py-2 rounded">
+        <Ionicons name="notifications-outline" size={15} color="white" />
         <Text className="text-white font-medium">{text}</Text>
       </View>
     </Animated.View>

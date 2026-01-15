@@ -1,6 +1,6 @@
 import { Link, router } from "expo-router";
 import Joi from "joi";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -118,7 +118,13 @@ const SignIn: React.FC = () => {
       setLoading(false);
     }
   };
+ const completeOnboarding = useAppStore(s => s.completeOnboarding);
+  const hasCompletedOnboarding = useAppStore(s => s.hasCompletedOnboarding);
 
+  // Complete onboarding only once
+  useEffect(() => {
+    if (!hasCompletedOnboarding) completeOnboarding();
+  }, []);
   /* ===================== UI ===================== */
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#093131" }}>
