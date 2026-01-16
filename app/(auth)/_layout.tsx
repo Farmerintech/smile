@@ -38,7 +38,7 @@ export default function RootLayout() {
    const {user} = useAppStore();
     useEffect(()=>{
       if(user && user.email!==''){
-        router.replace("/(tabs)")
+        router.replace("/(tabs)/home")
       }
     })
   const router = useRouter();
@@ -94,13 +94,7 @@ export default function RootLayout() {
         headerTitle: '',
 
         }} />
-         <Stack.Screen name="changePsw" 
-        options={{
-          headerShown: false,
-          headerShadowVisible: false,
-        headerTitle: 'Change Password',
-
-        }} />
+      
        {/* <Stack.Screen
   name="account"
   options={{
@@ -120,13 +114,7 @@ export default function RootLayout() {
   }}
 /> */}
 
-          <Stack.Screen name="changeNumber" 
-        options={{
-          headerShown: false,
-          headerShadowVisible: false,
-        headerTitle: 'Change Number',
-
-        }} />
+         
         <Stack.Screen name="otp" 
         options={{
           headerShown: false,

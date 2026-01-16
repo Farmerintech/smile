@@ -1,6 +1,6 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack, useRouter } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import "../../global.css";
@@ -21,10 +21,10 @@ export default function RootLayout() {
     const {user} = useAppStore();
     useEffect(()=>{
       if(!user || user.email===''){
-        router.push("/(auth)")
+        router.push("/(auth)/signin")
       }
     })
-const router = useRouter()
+
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack
@@ -55,6 +55,20 @@ const router = useRouter()
     ),
   }}
 /> 
+ <Stack.Screen name="changeNumber" 
+        options={{
+          headerShown: false,
+          headerShadowVisible: false,
+        headerTitle: 'Change Number',
+
+        }} />
+           <Stack.Screen name="changePsw" 
+        options={{
+          headerShown: false,
+          headerShadowVisible: false,
+        headerTitle: 'Change Password',
+
+        }} />
       </Stack>
 
       <StatusBar style="auto" />

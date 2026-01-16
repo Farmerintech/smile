@@ -21,8 +21,8 @@ const Account: React.FC = () => {
       
       <Item icon="person" label={user.username} />
       <Item icon="mail" label={user.email} />
-      <Item icon="key" label="Change password" onPress={()=>router.push("/(screens)/changePsw")}/>
-      <Item icon="call" label="Change number" onPress={()=>router.push("/(screens)/changeNumber")}/>
+      <Item icon="key" label="Change password" onPress={()=>router.replace("/(screens)/changePsw")}/>
+      <Item icon="call" label="Change number" onPress={()=>router.replace("/(screens)/changeNumber")}/>
       <Item icon="wallet" label="Payment methods"  />
       <Item icon="settings" label="support"  />
     </View>
