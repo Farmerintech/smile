@@ -18,9 +18,9 @@ export default function RootLayout() {
 
     if (hasCompletedOnboarding) {
       if (user?.email!=='') {
-        router.replace("/(tabs)/home");
+        router.replace("/(tabs)");
       } else {
-        router.replace("/(auth)/signup");
+        router.replace("/(auth)");
       }
     }
   }, [hasCompletedOnboarding, loading, user]);

@@ -36,7 +36,7 @@ type TabBarButtonProps = {
     const {user} = useAppStore();
     useEffect(()=>{
       if(!user || user.email===''){
-        router.push("/(auth)/signin")
+        router.push("/(auth)")
       }
     })
   return (

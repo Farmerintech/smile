@@ -93,11 +93,11 @@ export default function RootLayout() {
     }
 
     if (!user || !user.email) {
-      router.replace("/(auth)/signin");
+      router.replace("/(auth)");
       return;
     }
 
-    router.replace("/(tabs)/home");
+    router.replace("/(tabs)");
   }, [fontsLoaded, hasCompletedOnboarding, user]);
 
 if (!fontsLoaded) {
