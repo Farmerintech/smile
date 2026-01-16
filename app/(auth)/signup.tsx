@@ -1,6 +1,6 @@
 import CountrySelectWithInput from "@/components/countries";
 import { InputFields } from "@/components/form/formInput";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import Joi from "joi";
 import React, { useState } from "react";
 import {
@@ -72,7 +72,7 @@ const SignUp: React.FC = () => {
   const [showNotification, setShowNotification] = useState(false);
 
   const handleFormChange = (key: keyof FormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
+    setFormData((prev) => ({ ...prev, [key]: value.trim() }));
     if (error[key]) setError((prev) => ({ ...prev, [key]: "" }));
   };
 
@@ -233,9 +233,9 @@ const SignUp: React.FC = () => {
             <Text className="text-gray-500 text-sm">
               Already have an account?
             </Text>
-            <Link href="/signin" className="underline text-[#1EBA8D] text-sm">
-              Login
-            </Link>
+            <TouchableOpacity onPress={()=>router.replace("/(auth)/signin")} >
+                <Text className="underline text-green-600 text-sm">Login</Text>
+            </TouchableOpacity>
           </View>
         </KeyboardAwareScrollView>
       </View>

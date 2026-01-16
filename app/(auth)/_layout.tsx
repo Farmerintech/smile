@@ -2,11 +2,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack, useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
 import "../../global.css";
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useAppStore } from '../store/useAppStore';
 
 export const BottomShadow: React.FC = () => {
   return (
@@ -34,7 +35,12 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../../assets/fonts/SpaceMono-Regular.ttf'),
   });
-
+   const {user} = useAppStore();
+    useEffect(()=>{
+      if(user && user.email!==''){
+        router.replace("/(tabs)/home")
+      }
+    })
   const router = useRouter();
 
   if (!loaded) {
@@ -95,7 +101,7 @@ export default function RootLayout() {
         headerTitle: 'Change Password',
 
         }} />
-       <Stack.Screen
+       {/* <Stack.Screen
   name="account"
   options={{
     headerShown: true,
@@ -112,7 +118,7 @@ export default function RootLayout() {
       </View>
     ),
   }}
-/>
+/> */}
 
           <Stack.Screen name="changeNumber" 
         options={{

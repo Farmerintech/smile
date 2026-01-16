@@ -1,7 +1,7 @@
 import { focusManager } from '@tanstack/react-query';
 import { AppState } from 'react-native';
 
-export function setupFocusManager() {
+export default function setupFocusManager() {
   let state = AppState.currentState;
 
   AppState.addEventListener('change', (next) => {

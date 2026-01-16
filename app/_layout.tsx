@@ -1,4 +1,4 @@
-import { setupFocusManager } from "@/app/lib/focusManager";
+import setupFocusManager from "@/app/lib/focusManager";
 import setupOnlineManager from "@/app/lib/onlineManager";
 import { queryClient } from "@/app/lib/queryClient";
 import { useAppStore } from "@/app/store/useAppStore";

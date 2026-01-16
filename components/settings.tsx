@@ -70,11 +70,11 @@ const SettingsList = () => {
   const router = useRouter();
 const {setUser, logout} = useAppStore()
   const goTo = () =>{
-    router.push("/(screens)/account")
+    router.replace("/(screens)/account")
   }
 const Logout = () =>{
 logout();
-router.push("/(auth)/signin")
+router.replace("/(auth)/signin")
 }
   return (
     <View

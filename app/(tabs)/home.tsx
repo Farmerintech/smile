@@ -8,7 +8,7 @@ import * as Notifications from "expo-notifications";
 import { useCallback, useEffect, useState } from "react";
 import "../../global.css";
 
-import { useFocusEffect, usePathname } from "expo-router";
+import { router, useFocusEffect, usePathname } from "expo-router";
 import {
   BackHandler,
   Dimensions,
@@ -116,7 +116,12 @@ const { addToCart } = useAppStore();
 
   };
   
-
+   const {user} = useAppStore();
+    useEffect(()=>{
+      if(!user || user.email===''){
+        router.replace("/(auth)/signin")
+      }
+    })
 
 useEffect(() => {
   (async () => {
@@ -165,7 +170,7 @@ useEffect(() => {
           return true; // prevent default navigation
         }
 
-        return false; // allow normal back behavior
+        // return false; // allow normal back behavior
       };
 
       const sub = BackHandler.addEventListener(
