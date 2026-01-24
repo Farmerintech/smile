@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Dimensions,
   Image,
@@ -11,6 +10,7 @@ import {
 } from "react-native";
 
 interface MPROPS {
+  name:string;
   visible: boolean;
   source: any;
   price: number;
@@ -32,6 +32,7 @@ export const CartModal = ({
   onReduce,
   onAddToCart,
   onRequestClose,
+  name
 }: MPROPS) => {
   return (
     <Modal transparent animationType="slide" visible={visible}>
@@ -40,7 +41,7 @@ export const CartModal = ({
           <TouchableWithoutFeedback>
             <View style={styles.modalSheet}>
               <View style={styles.imageWrapper}>
-                <Image source={source} style={styles.image} />
+                <Image source={{ uri:source}} style={styles.image} />
                 <TouchableOpacity
                   onPress={onRequestClose}
                   style={styles.closeButton}
@@ -50,7 +51,7 @@ export const CartModal = ({
               </View>
 
               <View style={styles.content}>
-                <Text style={styles.title}>Item</Text>
+                <Text style={styles.title}>{name}</Text>
                 <Text style={styles.subtitle}>₦{price}</Text>
 
                 <View style={styles.buttonRow}>

@@ -91,7 +91,7 @@ const SignIn: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${BaseURL}/auth/login`, {
+      const response = await fetch(`${BaseURL}/auth/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

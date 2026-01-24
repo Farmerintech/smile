@@ -165,11 +165,10 @@ screenOptions={{
             </View>
           ),
           headerTitleAlign: "left",
-
           tabBarLabel: "Home",
           tabBarIcon: ({ focused }) => (
-            <MaterialIcons
-              name="home"
+            <Ionicons
+              name="home-outline"
               size={22}
               color={focused ? "#093131" : "gray"}
             />
@@ -185,7 +184,7 @@ screenOptions={{
           tabBarLabel: "Search",
           tabBarIcon: ({ focused }) => (
             <Ionicons
-              name="search"
+              name="search-outline"
               size={20}
               color={focused ? '#093131' : 'gray'}
             />
@@ -209,7 +208,7 @@ screenOptions={{
           tabBarLabel: "Orders",
           tabBarIcon: ({ focused }) => (
             <Ionicons
-              name="bag"
+              name="cart-outline"
               size={20}
               color={focused ? '#093131' : 'gray'}
             />
@@ -236,7 +235,7 @@ screenOptions={{
           tabBarLabel: "Profile",
           tabBarIcon: ({ focused }) => (
             <Ionicons
-              name="person"
+              name="person-outline"
               size={20}
               color={focused ? '#093131' : 'gray'}
             />
