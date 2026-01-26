@@ -105,13 +105,21 @@ const { addToCart } = useAppStore();
   const handleAddToCart = () => {
     if (!selectedItem) return;
 
-    addToCart({
-      id: selectedItem.storeId.toString(),
-      name: selectedItem.name,
-      price: selectedItem.price,
-      image: selectedItem.imageUrl,
-      quantity: itemCounts[selectedItem.storeId],
-    });
+  addToCart({
+  id: selectedItem.id,
+  // productId: selectedItem.id, // optional if you want both id & productId
+  name: selectedItem.name,
+  description: selectedItem.description,
+  price: selectedItem.price,
+  category: selectedItem.category,
+  imageUrl: selectedItem.imageUrl,
+  storeId: selectedItem.storeId,
+  isAvailable: selectedItem.isAvailable,
+  createdAt: selectedItem.createdAt,
+  updatedAt: selectedItem.updatedAt,
+  quantity: itemCounts[selectedItem.id] || 1, // quantity is the extra property
+});
+
 
     setModalVisible(false);
     sendTestNotification()

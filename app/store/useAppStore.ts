@@ -11,12 +11,21 @@ import {
 type Product = {
   id: string;
   name: string;
+  description: string;
   price: number;
-  image?: string;
+  category: string;
+  imageUrl?: string;
+  storeId: string;
+  isAvailable: boolean;
+  createdAt: string; // or Date
+  updatedAt: string; // or Date
 };
 
+// Each cart item now also has optional orderId and orderStatus
 export type CartItem = Product & {
   quantity: number;
+  orderId?: string; // set when checked out
+  orderStatus?: "pending" | "preparing" | "ready" | "picked_up" | "delivered" | "cancelled";
 };
 
 type LocationType = {
@@ -25,6 +34,7 @@ type LocationType = {
 };
 
 type User = {
+  id: string;
   username: string;
   email: string;
   isLoggedIn: boolean;
@@ -49,11 +59,13 @@ type AppState = {
   setWishlist: (wishlist: Product[]) => Promise<void>;
   refreshLocation: () => Promise<void>;
   logout: () => Promise<void>;
+  setOrderState: (itemId: string, orderId: string, orderStatus: CartItem["orderStatus"]) => Promise<void>;
 };
 
 /* ================= DEFAULTS ================= */
 
 const defaultUser: User = {
+  id: "",
   username: "",
   email: "",
   isLoggedIn: false,
@@ -121,6 +133,17 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   removeFromCart: async (id) => {
     const updatedCart = get().cart.filter((item) => item.id !== id);
+    set({ cart: updatedCart });
+    await setSecureItem("cart", updatedCart);
+  },
+
+  /* 🟢 Set order state for a cart item */
+  setOrderState: async (itemId, orderId, orderStatus) => {
+    const updatedCart = get().cart.map((item) =>
+      item.id === itemId
+        ? { ...item, orderId, orderStatus }
+        : item
+    );
     set({ cart: updatedCart });
     await setSecureItem("cart", updatedCart);
   },

@@ -104,6 +104,7 @@ const SignIn: React.FC = () => {
 
       if (response.ok) {
         setUser({
+          id:data.user.id,
           username: data.user.username,
           email: data.user.email,
           isLoggedIn: true,

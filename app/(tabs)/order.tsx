@@ -1,56 +1,165 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import * as Location from "expo-location";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   Image,
   ScrollView,
+  TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import "../../global.css";
 import { AppText } from "../_layout";
+import { BaseURL } from "../lib/api";
 import { useAppStore } from "../store/useAppStore";
-const Cart= require("@/assets/images/empty-cart.png")
 
 const Order = () => {
-  const { cart, addToCart, removeFromCart } = useAppStore();
+  const { cart, removeFromCart, user, setOrderState } = useAppStore();
   const isEmpty = cart.length === 0;
 
-  /* ================= TOTAL ================= */
-  const subTotal = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  // ------------------------- General Delivery Address -------------------------
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [address, setAddress] = useState(""); // human-readable address input
 
-  const deliveryFee = cart.length > 0 ? 1000 : 0;
-  const total = subTotal + deliveryFee;
+  // ------------------------- Loading state per store -------------------------
+  const [loadingStores, setLoadingStores] = useState<Record<string, boolean>>({});
 
-  /* ================= REMOVE ITEM ================= */
-const removeItem = async (id: string) => {
-  await removeFromCart(id);
-};
+  useEffect(() => {
+    const getLocation = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") return;
 
-const checkOut = async () =>{
-  cart.forEach(async item => {
-      await removeFromCart(item.id);
+      const loc = await Location.getCurrentPositionAsync({});
+      setLocation(loc);
+
+      // Reverse geocode to get readable address
+      const geo = await Location.reverseGeocodeAsync({
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+      });
+
+      if (geo.length > 0) {
+        const place = geo[0];
+        const formatted = `${place.street || ""}, ${place.city || ""}, ${place.region || ""}, ${place.country || ""}`;
+        setAddress(formatted);
+      }
+    };
+
+    getLocation();
+  }, []);
+
+  // ------------------------- Remove item -------------------------
+  const removeItem = async (id: string) => {
+    await removeFromCart(id);
+  };
+
+  // ------------------------- Checkout per store -------------------------
+  const checkOutStore = async (storeId: string) => {
+    if (loadingStores[storeId]) return; // prevent double click
+    setLoadingStores(prev => ({ ...prev, [storeId]: true }));
+
+    const storeItems = cart.filter(item => item.storeId === storeId);
+    if (!location) {
+      Alert.alert("Error", "Cannot checkout without coordinates");
+      setLoadingStores(prev => ({ ...prev, [storeId]: false }));
+      return;
+    }
+
+    const totalAmount = storeItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+    try {
+      const res = await fetch(`${BaseURL}/orders/create_order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.id,
+          storeId: storeId,
+          items: storeItems.map(item => ({
+            productId: item.id,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            totalPrice: item.price * item.quantity,
+          })),
+          totalAmount,
+          deliveryFee: 1000,
+          deliveryAddress: {
+            street: address,
+            city: "",
+            coordinates: {
+              lat: location.coords.latitude,
+              lng: location.coords.longitude,
+            },
+          },
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        Alert.alert("Success", "Order created successfully");
+
+        // Set order state for each item
+        await Promise.all(
+          storeItems.map(item => setOrderState(item.id, data.id, data.status))
+        );
+
+        // Remove items from cart
+        for (const item of storeItems) {
+          await removeFromCart(item.id);
+        }
+      } else {
+        Alert.alert("Error", data.message || "Checkout failed");
+      }
+    } catch (error) {
+      console.error("Checkout failed for store:", storeId, error);
+      Alert.alert("Error", "Checkout failed, please try again.");
+    }
+
+    setLoadingStores(prev => ({ ...prev, [storeId]: false }));
+  };
+
+  // ------------------------- Group items by store -------------------------
+  const storeGroups: Record<string, number[]> = {};
+  cart.forEach((item, index) => {
+    if (!storeGroups[item.storeId]) storeGroups[item.storeId] = [];
+    storeGroups[item.storeId].push(index);
   });
-  router.push("/(screens)/trackOrder")
-}
+
+  // ------------------------- Render -------------------------
   return (
-    <View style={{ flex: 1, backgroundColor: "white", paddingBottom: 160, }}>
+    <View style={{ flex: 1, backgroundColor: "white", paddingBottom: 160 }}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
           paddingTop: 50,
           paddingBottom: 160,
           paddingHorizontal: 16,
         }}
       >
+        {/* ================= Delivery Address Input ================= */}
+        <View className="mb-5">
+          <AppText className="text-black text-[20px] font-semibold mb-2">
+            Delivery Address
+          </AppText>
+          <TextInput
+            style={{
+              borderWidth: 1,
+              borderColor: "#ccc",
+              borderRadius: 8,
+              padding: 12,
+              marginBottom: 16,
+            }}
+            placeholder="Enter your delivery address"
+            value={address}
+            onChangeText={setAddress}
+          />
+        </View>
+
         {/* ================= CART ================= */}
         <View className="mb-5">
-          <AppText className="text-black text-[24px] font-bold mb-3">
-            Orders
-          </AppText>
+          <AppText className="text-black text-[24px] font-bold mb-3">Orders</AppText>
 
           {isEmpty ? (
             <View className="w-full h-[200px] flex items-center justify-center rounded-[25px] border border-gray-200">
@@ -59,87 +168,73 @@ const checkOut = async () =>{
             </View>
           ) : (
             <View className="gap-4">
-              {cart.map((item) => (
-                <View
-                  key={item.id}
-                  className="flex-row items-center gap-4 p-4 rounded-[20px] border border-gray-200"
-                >
-                  {/* Image */}
-                  {item.image && (
-                    <Image
-                      source={item.image || Cart}
-                      style={{
-                        width: 70,
-                        height: 70,
-                        borderRadius: 14,
-                      }}
-                    />
-                  )}
+              {cart.map((item, index) => {
+                const lastIndexForStore =
+                  storeGroups[item.storeId][storeGroups[item.storeId].length - 1];
+                const showCheckoutButton = index === lastIndexForStore;
 
-                  {/* Info */}
-                  <View className="flex-1">
-                    <AppText className="text-[16px] font-semibold text-black">
-                      {item.name}
-                    </AppText>
+                const storeTotal = storeGroups[item.storeId]
+                  .map(i => cart[i])
+                  .reduce((sum, it) => sum + it.price * it.quantity, 0);
 
-                    <AppText className="text-gray-500 text-[14px]">
-                      ₦{item.price} × {item.quantity}
-                    </AppText>
+                return (
+                  <View key={item.id}>
+                    {/* Individual Cart Item */}
+                    <View className="flex-row items-center gap-4 p-4 rounded-[20px] border border-gray-200">
+                      {item.imageUrl && (
+                        <Image
+                          source={{ uri: item.imageUrl }}
+                          style={{ width: 70, height: 70, borderRadius: 14 }}
+                        />
+                      )}
+                      <View className="flex-1">
+                        <AppText className="text-[16px] font-semibold text-black">
+                          {item.name}
+                        </AppText>
+                        <AppText className="text-gray-500 text-[14px]">
+                          ₦{item.price} × {item.quantity}
+                        </AppText>
+                      </View>
+                      <AppText className="text-black font-bold">
+                        ₦{item.price * item.quantity}
+                      </AppText>
+                      <TouchableOpacity onPress={() => removeItem(item.id)}>
+                        <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                      </TouchableOpacity>
+                    </View>
+
+                    {/* Checkout Button for this Store */}
+                    {showCheckoutButton && (
+                      <View className="mt-2 mb-4">
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: "#093131",
+                            paddingVertical: 12,
+                            borderRadius: 16,
+                            alignItems: "center",
+                            flexDirection: "row",
+                            justifyContent: "center",
+                          }}
+                          onPress={() => checkOutStore(item.storeId)}
+                          disabled={!!loadingStores[item.storeId]}
+                        >
+                          {loadingStores[item.storeId] ? (
+                            <ActivityIndicator color="#fff" />
+                          ) : (
+                            <AppText className="text-white font-semibold text-[16px]">
+                              Checkout ₦{storeTotal}
+                            </AppText>
+                          )}
+                        </TouchableOpacity>
+                      </View>
+                    )}
                   </View>
-
-                  {/* Price */}
-                  <AppText className="text-black font-bold">
-                    ₦{item.price * item.quantity}
-                  </AppText>
-
-                  {/* Remove */}
-                  <TouchableOpacity onPress={() => removeItem(item.id)}>
-                    <Ionicons name="trash-outline" size={20} color="#EF4444" />
-                  </TouchableOpacity>
-                </View>
-              ))}
+                );
+              })}
             </View>
           )}
         </View>
-
-        {/* ================= CONTINUE ================= */}
-        <View className="mb-5">
-          <AppText className="text-black text-[26px] font-bold mb-2">
-            Continue your Orders
-          </AppText>
-
-          <View className="w-full h-[200px] rounded-[25px] border border-gray-200 flex items-center justify-center">
-            <Ionicons name="bag-outline" size={50} />
-            <AppText>No Order in progress..</AppText>
-          </View>
-        </View>
       </ScrollView>
-
-      {/* ================= CHECKOUT ================= */}
-      {!isEmpty && (
-        <View className="absolute bottom-0 left-0 right-0 bg-white p-5 border-t border-gray-200">
-          <View className="flex-row justify-between mb-2">
-            <AppText>Subtotal</AppText>
-            <AppText>₦{subTotal}</AppText>
-          </View>
-
-          <View className="flex-row justify-between mb-2">
-            <AppText>Delivery</AppText>
-            <AppText>₦{deliveryFee}</AppText>
-          </View>
-
-          <View className="flex-row justify-between mb-4">
-            <AppText className="font-bold">Total</AppText>
-            <AppText className="font-bold">₦{total}</AppText>
-          </View>
-
-          <TouchableOpacity className="bg-[#093131] py-4 rounded-[16px] items-center" onPress={()=>checkOut()}>
-            <AppText className="text-white font-semibold text-[16px]">
-              Checkout ₦{total}
-            </AppText>
-          </TouchableOpacity>
-        </View>
-      )}
     </View>
   );
 };
