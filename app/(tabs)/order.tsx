@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -10,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import "../../global.css";
 import { AppText } from "../_layout";
 import { BaseURL } from "../lib/api";
@@ -22,9 +24,16 @@ const Order = () => {
   // ------------------------- General Delivery Address -------------------------
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [address, setAddress] = useState(""); // human-readable address input
+  const [city, setCity] = useState("");
 
   // ------------------------- Loading state per store -------------------------
   const [loadingStores, setLoadingStores] = useState<Record<string, boolean>>({});
+
+  // ------------------------- Notes per item -------------------------
+  const [vendorNotes, setVendorNotes] = useState<Record<string, string>>({});
+  const [riderNotes, setRiderNotes] = useState<Record<string, string>>({});
+  const [showVendorNoteInput, setShowVendorNoteInput] = useState<Record<string, boolean>>({});
+  const [showRiderNoteInput, setShowRiderNoteInput] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const getLocation = async () => {
@@ -39,11 +48,11 @@ const Order = () => {
         latitude: loc.coords.latitude,
         longitude: loc.coords.longitude,
       });
-
       if (geo.length > 0) {
         const place = geo[0];
         const formatted = `${place.street || ""}, ${place.city || ""}, ${place.region || ""}, ${place.country || ""}`;
         setAddress(formatted);
+        setCity(`${place?.city}`);
       }
     };
 
@@ -82,12 +91,15 @@ const Order = () => {
             quantity: item.quantity,
             price: item.price,
             totalPrice: item.price * item.quantity,
+            imageUrl: item.imageUrl,
+            vendorNote: vendorNotes[item.id] || "",
+            riderNote: riderNotes[item.id] || "",
           })),
           totalAmount,
           deliveryFee: 1000,
           deliveryAddress: {
             street: address,
-            city: "",
+            city: city,
             coordinates: {
               lat: location.coords.latitude,
               lng: location.coords.longitude,
@@ -99,6 +111,7 @@ const Order = () => {
       const data = await res.json();
       if (res.ok) {
         Alert.alert("Success", "Order created successfully");
+        router.push("/(screens)/orderStatus");
 
         // Set order state for each item
         await Promise.all(
@@ -129,25 +142,24 @@ const Order = () => {
 
   // ------------------------- Render -------------------------
   return (
-    <View style={{ flex: 1, backgroundColor: "white", paddingBottom: 160 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white",}}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: 50,
-          paddingBottom: 160,
           paddingHorizontal: 16,
         }}
       >
         {/* ================= Delivery Address Input ================= */}
         <View className="mb-5">
-          <AppText className="text-black text-[20px] font-semibold mb-2">
+          <AppText className="text-black text-[20px] font-semibold mb-2 ml-2">
             Delivery Address
           </AppText>
           <TextInput
             style={{
               borderWidth: 1,
               borderColor: "#ccc",
-              borderRadius: 8,
+              borderRadius: 16,
               padding: 12,
               marginBottom: 16,
             }}
@@ -155,6 +167,16 @@ const Order = () => {
             value={address}
             onChangeText={setAddress}
           />
+        </View>
+
+        <View className="">
+          <TouchableOpacity
+            onPress={() => router.push("/(screens)/orderStatus")}
+            className="flex flex-row gap-5 text-white items-center justify-end"
+          >
+            <AppText>Track Orders</AppText>
+            <Ionicons name="chevron-forward" />
+          </TouchableOpacity>
         </View>
 
         {/* ================= CART ================= */}
@@ -180,7 +202,8 @@ const Order = () => {
                 return (
                   <View key={item.id}>
                     {/* Individual Cart Item */}
-                    <View className="flex-row items-center gap-4 p-4 rounded-[20px] border border-gray-200">
+                    <View className="p-4 rounded-[20px] border border-gray-200">
+                    <View className="flex-row items-center gap-4 ">
                       {item.imageUrl && (
                         <Image
                           source={{ uri: item.imageUrl }}
@@ -201,7 +224,69 @@ const Order = () => {
                       <TouchableOpacity onPress={() => removeItem(item.id)}>
                         <Ionicons name="trash-outline" size={20} color="#EF4444" />
                       </TouchableOpacity>
+
+                      </View>
+                      <View className="flex-row justify-center gap-3 mt-2">
+                      <TouchableOpacity
+                        onPress={() =>
+                          setShowVendorNoteInput(prev => ({
+                            ...prev,
+                            [item.id]: !prev[item.id],
+                          }))
+                        }
+                        className="bg-orange-500 text-white px-3 py-3 rounded-xl my-5"
+                      >
+                        <AppText className="text-white">Add Vendor Note</AppText>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setShowRiderNoteInput(prev => ({
+                            ...prev,
+                            [item.id]: !prev[item.id],
+                          }))
+                        }
+                        className="bg-orange-500 text-white px-3 py-3 rounded-xl my-5"
+                      >
+                        <AppText className="text-white">Add Rider Note</AppText>
+                      </TouchableOpacity>
                     </View>
+
+                    {showVendorNoteInput[item.id] && (
+                      <TextInput
+                        placeholder="Write a note for vendor..."
+                        value={vendorNotes[item.id] || ""}
+                        onChangeText={text =>
+                          setVendorNotes(prev => ({ ...prev, [item.id]: text }))
+                        }
+                        style={{
+                          borderWidth: 1,
+                          borderColor: "#ccc",
+                          borderRadius: 8,
+                          padding: 8,
+                          marginTop: 5,
+                        }}
+                      />
+                    )}
+                    {showRiderNoteInput[item.id] && (
+                      <TextInput
+                        placeholder="Write a note for rider..."
+                        value={riderNotes[item.id] || ""}
+                        onChangeText={text =>
+                          setRiderNotes(prev => ({ ...prev, [item.id]: text }))
+                        }
+                        style={{
+                          borderWidth: 1,
+                          borderColor: "#ccc",
+                          borderRadius: 8,
+                          padding: 8,
+                          marginTop: 5,
+                        }}
+                      />
+                    )}
+
+                    </View>
+
+                    {/* ================= Notes Section ================= */}
 
                     {/* Checkout Button for this Store */}
                     {showCheckoutButton && (
@@ -235,7 +320,7 @@ const Order = () => {
           )}
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

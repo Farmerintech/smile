@@ -55,6 +55,18 @@ export default function RootLayout() {
     ),
   }}
 /> 
+  <Stack.Screen name="orderStatus" 
+  options={{
+    headerShown: true,
+    headerShadowVisible: false,
+    headerTitle: "Order Status",
+    headerLeft: () => (
+      <TouchableOpacity  onPress={() => router.back()} style={{ paddingHorizontal: 10 }}>
+        <MaterialIcons name="chevron-left" size={28} />
+      </TouchableOpacity>
+    ),
+  }}
+/> 
  <Stack.Screen name="changeNumber" 
         options={{
           headerShown: false,

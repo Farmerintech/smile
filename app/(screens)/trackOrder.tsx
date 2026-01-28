@@ -15,7 +15,7 @@ const orderSteps = [
 
 export default function TrackOrder() {
   // Tab state: ongoing or completed
-  const [activeTab, setActiveTab] = useState<"ongoing" | "completed">("ongoing");
+  const [activeTab, setActiveTab] = useState<"ongoing" | "completed" | "cancelled">("ongoing");
 
   // Track state for each step
   const [track, setTrack] = useState({
@@ -217,8 +217,8 @@ const styles = StyleSheet.create({
 
 // Tabs Component
 type Props = {
-  activeTab: "ongoing" | "completed";
-  setActiveTab: (tab: "ongoing" | "completed") => void;
+  activeTab: "ongoing" | "completed" | "cancelled";
+  setActiveTab: (tab: "ongoing" | "completed" | "cancelled") => void;
 };
 
 export const OrderTabs = ({ activeTab, setActiveTab }: Props) => {
