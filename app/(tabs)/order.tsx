@@ -77,9 +77,10 @@ const Order = () => {
     }
 
     const totalAmount = storeItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
+    Alert.alert(city);
     try {
       const res = await fetch(`${BaseURL}/orders/create_order`, {
+        
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -100,10 +101,9 @@ const Order = () => {
           deliveryAddress: {
             street: address,
             city: city,
-            coordinates: {
               lat: location.coords.latitude,
               lng: location.coords.longitude,
-            },
+            
           },
         }),
       });
@@ -147,19 +147,20 @@ const Order = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: 50,
+          paddingBottom: 160,
           paddingHorizontal: 16,
         }}
       >
         {/* ================= Delivery Address Input ================= */}
         <View className="mb-5">
-          <AppText className="text-black text-[20px] font-semibold mb-2 ml-2">
+          <AppText className="text-black text-[20px] font-semibold mb-2">
             Delivery Address
           </AppText>
           <TextInput
             style={{
               borderWidth: 1,
               borderColor: "#ccc",
-              borderRadius: 16,
+              borderRadius: 8,
               padding: 12,
               marginBottom: 16,
             }}
@@ -217,6 +218,7 @@ const Order = () => {
                         <AppText className="text-gray-500 text-[14px]">
                           ₦{item.price} × {item.quantity}
                         </AppText>
+                       
                       </View>
                       <AppText className="text-black font-bold">
                         ₦{item.price * item.quantity}
@@ -226,7 +228,7 @@ const Order = () => {
                       </TouchableOpacity>
 
                       </View>
-                      <View className="flex-row justify-center gap-3 mt-2">
+                                          <View className="flex-row gap-3 mt-2">
                       <TouchableOpacity
                         onPress={() =>
                           setShowVendorNoteInput(prev => ({

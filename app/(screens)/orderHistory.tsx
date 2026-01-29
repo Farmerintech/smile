@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Image,
-  ScrollView,
-  StyleSheet,
-  View,
+    ActivityIndicator,
+    Image,
+    ScrollView,
+    StyleSheet,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AppText } from "../_layout";
@@ -21,7 +21,6 @@ type OrderItem = {
   imageUrl?: string;
   vendorNote?: string;
   riderNote?: string;
-  deliveryAddress:any
 };
 
 type Order = {
@@ -38,8 +37,6 @@ type Order = {
     | "cancelled";
   createdAt: string;
   imageUrl?: string;
-  deliveryAddress:any
-    orderStatusVendor:string;
 };
 
 export default function OrderStatus() {
@@ -126,6 +123,7 @@ export default function OrderStatus() {
       </View>
     );
   }
+
   // ================= EMPTY =================
   if (!displayedOrders.length) {
     return (
@@ -150,9 +148,9 @@ export default function OrderStatus() {
               <Image source={{ uri: order.imageUrl }} style={styles.image} />
             )}
 
-            {/* <AppText style={styles.orderId}>Order ID: {order.id}</AppText> */}
+            <AppText style={styles.orderId}>Order ID: {order.id}</AppText>
             <AppText>
-              Status: {order?.orderStatusVendor?.replace("-", " ").toLocaleUpperCase()}
+              Status: {order?.orderStatus?.replace("_", " ").toUpperCase()}
             </AppText>
 
             {/* ================= ITEMS ================= */}
@@ -170,9 +168,7 @@ export default function OrderStatus() {
                       {item.name} × {item.quantity}
                     </AppText>
                     <AppText style={styles.itemPrice}>₦{item.totalPrice}</AppText>
-                    {/* <AppText>
-                      {item.deliveryAddress.stret}
-                    </AppText> */}
+
                     {item.vendorNote ? (
                       <AppText style={styles.itemNote}>
                         Vendor: {item.vendorNote}
@@ -188,7 +184,7 @@ export default function OrderStatus() {
                 </View>
               ))}
             </View>
-            <AppText>Delivery Location: {order.deliveryAddress.street}</AppText>
+
             <AppText style={styles.total}>
               Total: ₦{order.totalAmount + order.deliveryFee}
             </AppText>
