@@ -229,7 +229,9 @@ export const OrderTabs = ({ activeTab, setActiveTab }: Props) => {
         backgroundColor: "#F3F4F6",
         borderRadius: 12,
         padding: 4,
-        marginHorizontal: 14,
+        // marginHorizontal: 14,
+        position:"fixed",
+        top:0,
         marginBottom: 10,
       }}
     >

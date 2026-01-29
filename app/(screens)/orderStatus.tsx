@@ -6,7 +6,6 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { AppText } from "../_layout";
 import { BaseURL } from "../lib/api";
 import { useAppStore } from "../store/useAppStore";
@@ -140,7 +139,7 @@ export default function OrderStatus() {
 
   // ================= RENDER =================
   return (
-    <SafeAreaView>
+    // <SafeAreaView>
       <ScrollView contentContainerStyle={styles.container}>
         <OrderTabs activeTab={activeTab} setActiveTab={handleTabChange} />
 
@@ -151,7 +150,7 @@ export default function OrderStatus() {
             )}
 
             {/* <AppText style={styles.orderId}>Order ID: {order.id}</AppText> */}
-            <AppText>
+            <AppText className="flex text-right">
               Status: {order?.orderStatusVendor?.replace("-", " ").toLocaleUpperCase()}
             </AppText>
 
@@ -195,7 +194,7 @@ export default function OrderStatus() {
           </View>
         ))}
       </ScrollView>
-    </SafeAreaView>
+    // </SafeAreaView>
   );
 }
 
@@ -204,6 +203,8 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     paddingBottom: 120,
+        backgroundColor: "white",
+
   },
   orderCard: {
     borderWidth: 1,
@@ -258,7 +259,7 @@ const styles = StyleSheet.create({
   },
   center: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
     padding: 16,
   },
