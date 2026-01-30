@@ -18,12 +18,12 @@ export default function RootLayout() {
   });
 
   // if (!loaded) return null;
-    const {user} = useAppStore();
+const user = useAppStore((state) => state.user);
     useEffect(()=>{
-      if(!user || user.email===''){
+      if(!user){
         router.push("/(auth)/signin")
       }
-    })
+    }, [user])
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>

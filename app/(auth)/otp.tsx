@@ -1,8 +1,7 @@
-import { NotificationBar } from '@/components/NotificationBar';
+import Countdown from "@/components/countdown";
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useRef, useState, useEffect } from 'react';
-import Countdown from "@/components/countdown"
+import React, { useRef, useState } from 'react';
 import {
   NativeSyntheticEvent,
   SafeAreaView,
@@ -66,7 +65,7 @@ const router = useRouter()
   return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "#FFF", paddingTop:60, paddingLeft:10, paddingRight:10}}>
           <StatusBar barStyle="dark-content" />
-{notifTrigger && <NotificationBar text="New verification code sent" trigger={notifTrigger} />}
+{/* {notifTrigger && <NotificationBar text="New verification code sent" trigger={notifTrigger} />} */}
           <ScrollView
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"

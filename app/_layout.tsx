@@ -39,6 +39,50 @@ Notifications.setNotificationHandler({
   }),
 });
 
+
+
+// async function registerForPushNotificationsAsync() {
+//   let token;
+
+//   if (Constants.isDevice) {
+//     const { status: existingStatus } = await Notifications.getPermissionsAsync();
+//     let finalStatus = existingStatus;
+
+//     if (existingStatus !== "granted") {
+//       const { status } = await Notifications.requestPermissionsAsync();
+//       finalStatus = status;
+//     }
+
+//     if (finalStatus !== "granted") {
+//       alert("Failed to get push token for push notifications!");
+//       return;
+//     }
+
+//     token = (await Notifications.getExpoPushTokenAsync()).data;
+//     console.log("Expo Push Token:", token);
+//   } else {
+//     alert("Must use physical device for Push Notifications");
+//   }
+
+//   if (Platform.OS === "android") {
+//     Notifications.setNotificationChannelAsync("default", {
+//       name: "default",
+//       importance: Notifications.AndroidImportance.MAX,
+//       vibrationPattern: [0, 250, 250, 250],
+//       lightColor: "#FF231F7C",
+//     });
+//   }
+
+//   return token;
+// }
+
+// useEffect(() => {
+//   registerForPushNotificationsAsync().then(token => {
+//     // Send this token to your backend to save it with the user
+//     Alert.alert(token||"")
+//   });
+// }, []);
+
 /* ================================
    🔄 REACT QUERY
 ================================ */
@@ -58,13 +102,11 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+const user = useAppStore((state) => state.user);
+ const hasCompletedOnboarding = useAppStore(s => s.hasCompletedOnboarding);
+  const hydrate = useAppStore(s => s.hydrate);
 
-  const {
-    hydrate,
-    user,
-    hasCompletedOnboarding,
-  } = useAppStore();
-
+ 
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
@@ -88,6 +130,7 @@ export default function RootLayout() {
     if (!fontsLoaded) return;
 
     if (!hasCompletedOnboarding) {
+      console.log(hasCompletedOnboarding)
       router.replace("/(onboarding)");
       return;
     }
@@ -121,10 +164,10 @@ if (!fontsLoaded) {
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
           <Stack screenOptions={screenOptions}>
-            <Stack.Screen name="(onboarding)" />
-            <Stack.Screen name="(auth)" />
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="(screens)" />
+            <Stack.Screen name="(onboarding)" />
+            <Stack.Screen name="(auth)" />
           </Stack>
         </ThemeProvider>
       </QueryClientProvider>

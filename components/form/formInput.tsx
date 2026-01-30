@@ -54,7 +54,7 @@ export const InputFields: React.FC<InputFieldsProps> = ({
             secureTextEntry={name === "Password" && !showPsw}
             onChangeText={action}
             keyboardType={name === "Phone Number" ? "phone-pad" : "default"}
-            className="w-full"
+            className="w-full outline-none border-none"
           />
         </View>
 

@@ -1,16 +1,17 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import CircularProgress from "react-native-circular-progress-indicator";
 
 interface progressBarProps {
   index: number;
   mylink: any;
   value: number
+  action?:()=>void
 }
-export const ProgressBar = ({ index, mylink, value }: progressBarProps) => {
+export const ProgressBar = ({ index, mylink, value, action }: progressBarProps) => {
   return (
-    <View style={styles.mainContainer}>
+    <Pressable style={styles.mainContainer} onPress={()=>action}>
       <View>
         <View style={styles.progressContainer}>
           <View
@@ -33,7 +34,7 @@ export const ProgressBar = ({ index, mylink, value }: progressBarProps) => {
       <Link href={mylink}>
         <ProgressIndicator realvalue={value} />
       </Link>
-    </View>
+    </Pressable>
   );
 };
 

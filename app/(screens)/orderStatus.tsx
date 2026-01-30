@@ -1,15 +1,19 @@
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  Pressable,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
-  View,
+  View
 } from "react-native";
 import { AppText } from "../_layout";
 import { BaseURL } from "../lib/api";
 import { useAppStore } from "../store/useAppStore";
-import { OrderTabs } from "./trackOrder";
+import { OrderTabs } from "./orderTabs";
 
 type OrderItem = {
   productId: string;
@@ -20,7 +24,7 @@ type OrderItem = {
   imageUrl?: string;
   vendorNote?: string;
   riderNote?: string;
-  deliveryAddress:any
+  deliveryAddress: any;
 };
 
 type Order = {
@@ -37,17 +41,24 @@ type Order = {
     | "cancelled";
   createdAt: string;
   imageUrl?: string;
-  deliveryAddress:any
-    orderStatusVendor:string;
+  deliveryAddress: any;
+  orderStatusVendor: string;
 };
+
+type RootStackParamList = {
+  OrderStatus: undefined;
+  trackOrder: { orderId: string };
+};
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "OrderStatus">;
 
 export default function OrderStatus() {
   const { user } = useAppStore();
+  const navigation = useNavigation<NavigationProp>();
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [displayedOrders, setDisplayedOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
-
   const [activeTab, setActiveTab] = useState<"ongoing" | "completed" | "cancelled">(
     "ongoing"
   );
@@ -60,22 +71,13 @@ export default function OrderStatus() {
       setLoading(true);
       try {
         const res = await fetch(`${BaseURL}/orders/get_user_orders`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
+          headers: { Authorization: `Bearer ${user.token}` },
         });
 
         const data = await res.json();
         if (res.ok) {
           setOrders(data.data);
-
-          // default tab = ongoing
-          const ongoingOrders = data.data.filter(
-            (order: Order) =>
-              order.orderStatus !== "delivered" &&
-              order.orderStatus !== "cancelled"
-          );
-          setDisplayedOrders(ongoingOrders);
+          handleTabChange(activeTab, data.data);
         } else {
           console.error("Failed to fetch orders:", data.message);
         }
@@ -90,31 +92,27 @@ export default function OrderStatus() {
   }, [user?.id]);
 
   // ================= TAB CLICK HANDLER =================
-  const handleTabChange = (tab: "ongoing" | "completed" | "cancelled") => {
+  const handleTabChange = (
+    tab: "ongoing" | "completed" | "cancelled",
+    ordersList: Order[] = orders
+  ) => {
     setActiveTab(tab);
 
+    let filteredOrders = [];
     if (tab === "completed") {
-      setDisplayedOrders(
-        orders.filter(order => order.orderStatus === "delivered")
+      filteredOrders = ordersList.filter(order => order.orderStatus === "delivered");
+    } else if (tab === "cancelled") {
+      filteredOrders = ordersList.filter(order => order.orderStatus === "cancelled");
+    } else {
+      filteredOrders = ordersList.filter(
+        order => order.orderStatus !== "delivered" && order.orderStatus !== "cancelled"
       );
-      return;
     }
+    setDisplayedOrders(filteredOrders);
+  };
 
-    if (tab === "cancelled") {
-      setDisplayedOrders(
-        orders.filter(order => order.orderStatus === "cancelled")
-      );
-      return;
-    }
-
-    // ongoing = everything else
-    setDisplayedOrders(
-      orders.filter(
-        order =>
-          order.orderStatus !== "delivered" &&
-          order.orderStatus !== "cancelled"
-      )
-    );
+  const handleItemPress = (orderId: string) => {
+    navigation.navigate("trackOrder", { orderId });
   };
 
   // ================= LOADING =================
@@ -125,87 +123,78 @@ export default function OrderStatus() {
       </View>
     );
   }
+
   // ================= EMPTY =================
   if (!displayedOrders.length) {
     return (
-      <View style={styles.center}>
+      <SafeAreaView style={styles.safeArea}>
         <OrderTabs activeTab={activeTab} setActiveTab={handleTabChange} />
-        <AppText style={{ marginTop: 20 }}>
-          No {activeTab} orders found.
-        </AppText>
-      </View>
+        <View style={styles.center}>
+          <AppText style={{ marginTop: 20 }}>
+            No {activeTab} orders found.
+          </AppText>
+        </View>
+      </SafeAreaView>
     );
   }
 
   // ================= RENDER =================
   return (
-    // <SafeAreaView>
+    <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         <OrderTabs activeTab={activeTab} setActiveTab={handleTabChange} />
 
         {displayedOrders.map(order => (
-          <View key={order.id} style={styles.orderCard}>
+          <Pressable key={order.id} style={styles.orderCard}                   
+          onPress={() => handleItemPress(order.id)}
+>
             {order.imageUrl && (
               <Image source={{ uri: order.imageUrl }} style={styles.image} />
             )}
 
-            {/* <AppText style={styles.orderId}>Order ID: {order.id}</AppText> */}
             <AppText className="flex text-right">
               Status: {order?.orderStatusVendor?.replace("-", " ").toLocaleUpperCase()}
             </AppText>
 
-            {/* ================= ITEMS ================= */}
             <View style={{ marginTop: 8 }}>
               {order.items.map(item => (
-                <View key={item.productId} style={styles.itemRow}>
-                  {/* Image on left */}
+                <Pressable
+                  key={item.productId}
+                  style={styles.itemRow}
+                >
                   {item.imageUrl && (
                     <Image source={{ uri: item.imageUrl }} style={styles.itemImage} />
                   )}
-
-                  {/* Details on right */}
                   <View style={styles.itemDetails}>
                     <AppText style={styles.itemName}>
                       {item.name} × {item.quantity}
                     </AppText>
                     <AppText style={styles.itemPrice}>₦{item.totalPrice}</AppText>
-                    {/* <AppText>
-                      {item.deliveryAddress.stret}
-                    </AppText> */}
-                    {item.vendorNote ? (
-                      <AppText style={styles.itemNote}>
-                        Vendor: {item.vendorNote}
-                      </AppText>
-                    ) : null}
-
-                    {item.riderNote ? (
-                      <AppText style={styles.itemNote}>
-                        Rider: {item.riderNote}
-                      </AppText>
-                    ) : null}
+                    {item.vendorNote && (
+                      <AppText style={styles.itemNote}>Vendor: {item.vendorNote}</AppText>
+                    )}
+                    {item.riderNote && (
+                      <AppText style={styles.itemNote}>Rider: {item.riderNote}</AppText>
+                    )}
                   </View>
-                </View>
+                </Pressable>
               ))}
             </View>
             <AppText>Delivery Location: {order.deliveryAddress.street}</AppText>
             <AppText style={styles.total}>
               Total: ₦{order.totalAmount + order.deliveryFee}
             </AppText>
-          </View>
+          </Pressable>
         ))}
       </ScrollView>
-    // </SafeAreaView>
+    </SafeAreaView>
   );
 }
 
 // ================= STYLES =================
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    paddingBottom: 120,
-        backgroundColor: "white",
-
-  },
+  safeArea: { flex: 1, backgroundColor: "white" },
+  container: { padding: 16, paddingBottom: 80 }, // ensure content doesn't overlap nav bar
   orderCard: {
     borderWidth: 1,
     borderColor: "#ccc",
@@ -214,15 +203,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     backgroundColor: "white",
   },
-  orderId: {
-    fontWeight: "bold",
-    marginBottom: 6,
-  },
   itemRow: {
     flexDirection: "row",
     alignItems: "flex-start",
     marginVertical: 6,
-    gap: 12, // space between image and details
+    gap: 12,
   },
   itemImage: {
     width: 60,
@@ -233,34 +218,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
   },
-  itemName: {
-    fontWeight: "500",
-    fontSize: 16,
-  },
-  itemPrice: {
-    fontWeight: "bold",
-    fontSize: 14,
-    marginTop: 2,
-  },
-  itemNote: {
-    fontSize: 12,
-    color: "#555",
-    marginTop: 2,
-  },
-  total: {
-    marginTop: 10,
-    fontWeight: "bold",
-  },
-  image: {
-    width: 70,
-    height: 70,
-    borderRadius: 14,
-    marginBottom: 10,
-  },
-  center: {
-    flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
-    padding: 16,
-  },
+  itemName: { fontWeight: "500", fontSize: 16 },
+  itemPrice: { fontWeight: "bold", fontSize: 14, marginTop: 2 },
+  itemNote: { fontSize: 12, color: "#555", marginTop: 2 },
+  total: { marginTop: 10, fontWeight: "bold" },
+  image: { width: 70, height: 70, borderRadius: 14, marginBottom: 10 },
+  center: { flex: 1, justifyContent: "flex-start", alignItems: "center", padding: 16 },
 });

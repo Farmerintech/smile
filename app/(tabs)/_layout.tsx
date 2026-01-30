@@ -38,7 +38,7 @@ type TabBarButtonProps = {
       if(!user || user.email===''){
         router.replace("/(auth)/signin")
       }
-    })
+    }, [user])
   return (
     <Tabs
 screenOptions={{

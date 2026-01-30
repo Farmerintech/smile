@@ -1,23 +1,26 @@
+import { useAppStore } from "@/app/store/useAppStore";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { Stack, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
-
-import { useAppStore } from "@/app/store/useAppStore";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import "../../global.css";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const { hasCompletedOnboarding, loading, user } = useAppStore();
+ const loading = useAppStore(s => s.loading);
+  const hasCompletedOnboarding = useAppStore(s => s.hasCompletedOnboarding);
+const user = useAppStore((state) => state.user);
 
   /* 🚦 GUARD: prevent onboarding from ever showing again */
   useEffect(() => {
     if (loading) return;
 
     if (hasCompletedOnboarding) {
-      if (user?.email!=='') {
+      console.log(hasCompletedOnboarding)
+      if (user && user?.email!=='') {
+        console.log(user )
         router.replace("/(tabs)/home");
       } else {
         router.replace("/(auth)/signin");

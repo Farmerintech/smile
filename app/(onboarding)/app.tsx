@@ -1,6 +1,6 @@
 import { useAppStore } from "@/app/store/useAppStore";
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect } from 'react';
+import { router } from "expo-router";
 import { ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ProgressBar } from '../../components/progressBar';
@@ -14,17 +14,12 @@ export default function App() {
   const hasCompletedOnboarding = useAppStore(s => s.hasCompletedOnboarding);
 
   // Complete onboarding only once
- useEffect(() => {
-  return () => {
-    // This runs when the user LEAVES the onboarding page
-    if (!hasCompletedOnboarding) {
-      completeOnboarding();
-    }
-  };
-}, [hasCompletedOnboarding]);
 
 
-
+const handleFinish = async () => {
+  await completeOnboarding();
+  router.replace("/(auth)/signin");
+};
 
   // Redirect if user exists
 //   if (user.username !== '') return <Redirect href="/rider" />;
@@ -75,7 +70,7 @@ const style = StyleSheet.create({
 </View>
 
 
-          <ProgressBar index={2} mylink="/(auth)/signin" value={100} />
+          <ProgressBar index={2} mylink="/(auth)/signin" value={100} action={()=>handleFinish}/>
         </SafeAreaView>
       </ScrollView>
     </>

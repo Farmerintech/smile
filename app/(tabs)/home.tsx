@@ -138,7 +138,7 @@ useEffect(() => {
     try {
       const token = await registerForPushNotificationsAsync();
       if (token) {
-        console.log("TOKEN FROM SCREEN:", token);
+        console.error("TOKEN FROM SCREEN:", token);
       }
     } catch (err) {
       console.log("Push registration failed:", err);
