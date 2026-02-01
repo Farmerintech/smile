@@ -72,7 +72,7 @@ const SignUp: React.FC = () => {
   const [showNotification, setShowNotification] = useState(false);
 
   const handleFormChange = (key: keyof FormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [key]: value.trim() }));
+    setFormData((prev) => ({ ...prev, [key]: value}));
     if (error[key]) setError((prev) => ({ ...prev, [key]: "" }));
   };
 

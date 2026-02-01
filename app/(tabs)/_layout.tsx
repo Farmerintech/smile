@@ -1,7 +1,6 @@
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Tabs, useRouter } from 'expo-router';
-import { useEffect } from 'react';
 import { GestureResponderEvent, Image, StyleProp, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import "../../global.css";
@@ -32,13 +31,8 @@ type TabBarButtonProps = {
 
 // Usage in screenOptions
 
-
     const {user} = useAppStore();
-    useEffect(()=>{
-      if(!user || user.email===''){
-        router.replace("/(auth)/signin")
-      }
-    }, [user])
+  
   return (
     <Tabs
 screenOptions={{

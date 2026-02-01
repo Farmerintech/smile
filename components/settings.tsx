@@ -90,7 +90,7 @@ router.replace("/(auth)/signin")
       <Item icon="person-outline" label="Account" onPress={()=>{goTo()}} />
       <Item icon="notifications-outline" label="Notifications" />
       <Item icon="trash-outline" label="Delete my account" danger />
-      <Item icon="log-out-outline" label="Logout" danger  onPress={()=>{Logout()}} />
+      <Item icon="log-out-outline" label="Logout" danger  onPress={Logout} />
     </View>
   );
 };

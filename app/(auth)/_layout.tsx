@@ -35,13 +35,14 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../../assets/fonts/SpaceMono-Regular.ttf'),
   });
-const user = useAppStore((state) => state.user);
+    const router = useRouter();
+
+const {user} = useAppStore();
     useEffect(()=>{
       if(user && user.email!==''){
         router.replace("/(tabs)/home")
       }
-    }, [user])
-  const router = useRouter();
+    })
 
   if (!loaded) {
     return null;

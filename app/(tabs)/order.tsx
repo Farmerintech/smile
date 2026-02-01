@@ -51,9 +51,8 @@ const Order = () => {
       if (geo.length > 0) {
         const place = geo[0];
         const formatted = `${place.street || ""}, ${place.city || ""}, ${place.region || ""}, ${place.country || ""}`;
-        setAddress(place.formattedAddress || "");
-                // Alert.alert(place?.formattedAddress||"")
-
+        setAddress(formatted || "");
+          // Alert.alert(place?.formattedAddress||"")
         setCity(`${place?.city}`);
       }
     };

@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import * as Notifications from "expo-notifications";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -18,8 +17,33 @@ import { BaseURL } from "../lib/api";
 import { useAppStore } from "../store/useAppStore";
 
 /* ---------------------------- */
-/* Order Steps & Status Config */
+/* Order Status Config */
 /* ---------------------------- */
+const STATUS_FLOW = [
+  "pending",
+  "preparing",
+  "ready",
+  "picked-up",
+  "delivered",
+] as const;
+
+type OrderStatus =
+  | "pending"
+  | "preparing"
+  | "ready"
+  | "picked-up"
+  | "delivered"
+  | "canceled";
+
+const STATUS_ICONS: Record<OrderStatus, keyof typeof Ionicons.glyphMap> = {
+  pending: "time-outline",
+  preparing: "restaurant-outline",
+  ready: "cube-outline",
+  "picked-up": "bicycle-outline",
+  delivered: "checkmark",
+  canceled: "close",
+};
+
 const orderSteps = [
   { key: "pending", title: "Order pending" },
   { key: "preparing", title: "Preparing order" },
@@ -28,31 +52,13 @@ const orderSteps = [
   { key: "delivered", title: "Delivered" },
 ] as const;
 
-type OrderStatus = "pending" | "preparing" | "ready" | "picked-up" | "delivered";
-const STATUS_FLOW: OrderStatus[] = ["pending", "preparing", "ready", "picked-up", "delivered"];
-
-function buildTrack(status: OrderStatus) {
-  const track: Record<OrderStatus, boolean> = {
-    pending: false,
-    preparing: false,
-    ready: false,
-    "picked-up": false,
-    delivered: false,
-  };
-  for (const step of STATUS_FLOW) {
-    track[step] = true;
-    if (step === status) break;
-  }
-  return track;
-}
-
 /* ---------------------------- */
-/* Types for route params & order */
+/* Types */
 /* ---------------------------- */
 type RootStackParamList = {
-  OrderStatus: undefined;
   trackOrder: { orderId: string };
 };
+
 type TrackOrderRouteProp = RouteProp<RootStackParamList, "trackOrder">;
 
 type OrderItem = {
@@ -61,8 +67,6 @@ type OrderItem = {
   quantity: number;
   price: string;
   imageUrl: string;
-  vendorNote?: string;
-  riderNote?: string;
 };
 
 type Order = {
@@ -70,12 +74,31 @@ type Order = {
   items: OrderItem[];
   totalAmount: number;
   deliveryFee: number;
-  deliveryAddress: { street: string; city: string; lat: string; lng: string };
+  deliveryAddress: { street: string };
   orderStatusUser: OrderStatus;
 };
 
 /* ---------------------------- */
-/* Main Component */
+/* Helpers */
+/* ---------------------------- */
+const buildTrack = (status: OrderStatus) => {
+  if (status === "canceled") {
+    return Object.fromEntries(STATUS_FLOW.map(s => [s, false])) as Record<
+      typeof STATUS_FLOW[number],
+      boolean
+    >;
+  }
+
+  const track: any = {};
+  for (const step of STATUS_FLOW) {
+    track[step] = true;
+    if (step === status) break;
+  }
+  return track;
+};
+
+/* ---------------------------- */
+/* Component */
 /* ---------------------------- */
 export default function TrackOrder() {
   const route = useRoute<TrackOrderRouteProp>();
@@ -86,200 +109,218 @@ export default function TrackOrder() {
   const [status, setStatus] = useState<OrderStatus>("pending");
   const [track, setTrack] = useState(buildTrack("pending"));
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [lastNotifiedStatus, setLastNotifiedStatus] = useState<OrderStatus | null>(null);
+
+  const progressValue =
+    status === "canceled"
+      ? 0
+      : ((STATUS_FLOW.indexOf(status as any) + 1) /
+          STATUS_FLOW.length) *
+        100;
 
   /* ---------------------------- */
-  /* Fetch order data & status */
+  /* Fetch Order */
   /* ---------------------------- */
-  const fetchOrderStatus = async () => {
-    if (!orderId) return;
-
+  const fetchOrder = async () => {
     try {
       const res = await fetch(`${BaseURL}/orders/get_order/${orderId}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
       const json = await res.json();
-      const data = json.data; // backend sends order directly inside data
+      const data = json.data;
 
-      if (json.message) setMessage(json.message);
+      if (!res.ok) throw new Error("Failed to fetch order");
 
-      if (!res.ok) throw new Error(json.message || "Failed to fetch order");
-
-      const newStatus = data.orderStatusUser as OrderStatus;
-
-      if (!order || status !== newStatus) {
-        setOrder(data);
-        setStatus(newStatus);
-        setTrack(buildTrack(newStatus));
-      }
-
-      setError(null);
-    } catch (err: any) {
-      console.log("Fetch error:", err);
-      setError(err.message || "Failed to fetch order");
+      setOrder(data);
+      setStatus(data.orderStatusUser);
+      setTrack(buildTrack(data.orderStatusUser));
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchOrderStatus();
-    const interval = setInterval(fetchOrderStatus, 5000); // poll every 5s
+    fetchOrder();
+    const interval = setInterval(fetchOrder, 5000);
     return () => clearInterval(interval);
-  }, [orderId]);
+  }, []);
 
   /* ---------------------------- */
-  /* Push Notifications */
+  /* Loading */
   /* ---------------------------- */
-  useEffect(() => {
-    if (!status || status === lastNotifiedStatus) return;
-
-    const messages: Record<OrderStatus, { title: string; body: string }> = {
-      pending: { title: "Order pending", body: "Your order has been placed" },
-      preparing: { title: "Preparing order", body: "Vendor is preparing your order" },
-      ready: { title: "Order ready", body: "Your order is ready for pickup" },
-      "picked-up": { title: "Picked up", body: "Your order is on the way" },
-      delivered: { title: "Delivered 🎉", body: "You have received your order" },
-    };
-
-    const msg = messages[status];
-    Notifications.scheduleNotificationAsync({ content: msg, trigger: null });
-    setLastNotifiedStatus(status);
-  }, [status]);
-
-  /* ---------------------------- */
-  /* Loading & Error */
-  /* ---------------------------- */
-  if (loading)
+  if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#093131" />
-      </View>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#1EBA8D" />
+        </View>
+      </SafeAreaView>
     );
-
-  if (error)
-    return (
-      <View style={styles.center}>
-        <AppText>{error}</AppText>
-      </View>
-    );
+  }
 
   /* ---------------------------- */
   /* Render */
   /* ---------------------------- */
   return (
-        <SafeAreaView style={styles.safeArea}>
-    
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* ===== MESSAGE ===== */}
-      {message && (
-        <View style={styles.messageBox}>
-          <AppText>{message}</AppText>
-        </View>
-      )}
-
-      {/* ===== ORDER CARD ===== */}
-      <View style={styles.orderCard}>
-        {/* <AppTextBold>Order ID: {order?.id}</AppTextBold> */}
-        {order?.items?.map(item => (
-          <View key={item.productId} style={styles.itemRow}>
-            {item.imageUrl && <Image source={{ uri: item.imageUrl }} style={styles.itemImage} />}
-            <View style={styles.itemDetails}>
-              <AppText>{item.name} × {item.quantity}</AppText>
-              <AppText>₦{item.price}</AppText>
-            </View>
-          </View>
-        ))}
-        <AppText style={{ marginTop: 8 }}>Total: ₦{(order?.totalAmount || 0) + (order?.deliveryFee || 0)}</AppText>
-        <AppText>Delivery: {order?.deliveryAddress?.street}</AppText>
-        <AppText>Status: {order?.orderStatusUser?.toUpperCase()}</AppText>
-      </View>
-
-      {/* ===== CIRCULAR PROGRESS ===== */}
-      <View style={styles.circularWrapper}>
-        <CircularProgress
-          radius={50}
-          value={(STATUS_FLOW.indexOf(status!) + 1) * (100 / STATUS_FLOW.length)}
-          duration={800}
-          activeStrokeColor="#1EBA8D"
-          inActiveStrokeColor="#E5E7EB"
-          inActiveStrokeWidth={8}
-          activeStrokeWidth={8}
-          progressValueColor="black"
-          maxValue={100}
-        />
-      </View>
-
-      {/* ===== VERTICAL TIMELINE ===== */}
-      <FlatList
-        data={orderSteps}
-        keyExtractor={item => item.key}
-        scrollEnabled={false}
-        renderItem={({ item, index }) => {
-          const isLast = index === orderSteps.length - 1;
-          const isActive = track[item.key];
-          const next = orderSteps[index + 1];
-          const connectorActive = isActive || (next && track[next.key]);
-
-          return (
-            <View style={styles.row}>
-              <View style={styles.timeline}>
-                <View style={[styles.dot, isActive ? styles.dotActive : styles.dotInactive]}>
-                  {isActive && <Ionicons name="checkmark" size={14} color="#093131" />}
-                </View>
-                {!isLast && <View style={[styles.connector, connectorActive && styles.connectorActive]} />}
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ORDER CARD */}
+        <View style={styles.card}>
+          {order?.items.map(item => (
+            <View key={item.productId} style={styles.itemRow}>
+              <Image source={{ uri: item.imageUrl }} style={styles.image} />
+              <View style={{ flex: 1, flexDirection:"row", justifyContent:"space-between"}}>
+                <AppText>{item.name} × {item.quantity}</AppText>
+                <AppText>₦{item.price}</AppText>
               </View>
+            </View>
+          ))}
+          {/* <AppTextBold style={{ marginTop: 8 }}>
+            Total: ₦{order!.totalAmount + order!.deliveryFee}
+          </AppTextBold> */}
+          <AppText>Delivery: {order?.deliveryAddress.street}</AppText>
+        </View>
 
-              <View style={styles.content}>
-                <AppTextBold style={[styles.title, isActive && styles.titleActive]}>
+        {/* CIRCULAR PROGRESS */}
+        <View style={styles.progressWrapper}>
+          <CircularProgress
+            radius={55}
+            value={progressValue}
+            maxValue={100}
+            duration={700}
+            showProgressValue={false}
+            activeStrokeColor={
+              status === "canceled" ? "#EF4444" : "#1EBA8D"
+            }
+            inActiveStrokeColor="#E5E7EB"
+            inActiveStrokeOpacity={0.3}
+            activeStrokeWidth={8}
+            inActiveStrokeWidth={8}
+          />
+
+          <View
+            style={[
+              styles.progressCenter,
+              status === "canceled" && { backgroundColor: "#EF4444" },
+            ]}
+          >
+            <Ionicons
+              name={STATUS_ICONS[status]}
+              size={26}
+              color="#fff"
+            />
+          </View>
+        </View>
+
+        {/* TIMELINE */}
+        <View style={styles.card}>
+
+
+        <FlatList
+          data={orderSteps}
+          keyExtractor={i => i.key}
+          scrollEnabled={false}
+          renderItem={({ item, index }) => {
+            const isActive = track[item.key];
+            const isLast = index === orderSteps.length - 1;
+
+            return (
+              <View style={styles.row}>
+                <View style={styles.timeline}>
+                  <View
+                    style={[
+                      styles.dot,
+                      isActive ? styles.dotActive : styles.dotInactive,
+                    ]}
+                  >
+                    {isActive && (
+                      <Ionicons name="checkmark" size={14} color="#1EBA8D" />
+                    )}
+                  </View>
+                  {!isLast && <View style={styles.connector} />}
+                </View>
+
+                <AppTextBold
+                  style={[
+                    styles.title,
+                    isActive && { color: "#111827" },
+                  ]}
+                >
                   {item.title}
                 </AppTextBold>
               </View>
-            </View>
-          );
-        }}
-      />
-    </ScrollView>
+            );
+          }}
+        />
+                </View>
+
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 /* ---------------------------- */
 /* Styles */
+/* ---------------------------- */
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: "white" },
-  container: { padding: 16, backgroundColor: "#F9FAFB" },
-  center: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
-  messageBox: { backgroundColor: "#FEF3C7", padding: 12, borderRadius: 12, marginBottom: 16 },
-  orderCard: {
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
+  safeArea: { flex: 1,  paddingBottom:50 },
+  container: { padding: 16, paddingBottom: 40, backgroundColor:"#ffffffaf" },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+
+  card: {
+    backgroundColor: "#ffffffaf",
     borderRadius: 16,
     padding: 16,
     marginBottom: 24,
-    backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
-  itemRow: { flexDirection: "row", alignItems: "center", marginVertical: 6 },
-  itemImage: { width: 50, height: 50, borderRadius: 8, marginRight: 12 },
-  itemDetails: { flex: 1 },
+  itemRow: { flexDirection: "row", marginBottom: 10 },
+  image: { width: 50, height: 50, borderRadius: 8, marginRight: 12 },
 
-  circularWrapper: { alignItems: "center", marginVertical: 24 },
+  progressWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical:10,
+    backgroundColor: "#ffffffaf",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+  progressCenter: {
+    position: "absolute",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#1EBA8D",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
-  row: { flexDirection: "row", marginBottom: 8 },
+  row: { flexDirection: "row", marginBottom: 12 },
   timeline: { width: 30, alignItems: "center" },
-  dot: { width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center" },
-  dotActive: { borderColor: "#093131", borderWidth: 2, backgroundColor: "#E6F2F2" },
-  dotInactive: { borderColor: "#D1D5DB", borderWidth: 2 },
-  connector: { width: 2, height: 40, borderWidth: 1, borderStyle: "dashed", borderColor: "#D1D5DB", marginTop: 6 },
-  connectorActive: { borderColor: "#093131" },
-  content: { flex: 1, paddingLeft: 12 },
-  title: { fontSize: 15, color: "#6B7280" },
-  titleActive: { fontWeight: "500", color: "#111827" },
+  dot: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+  },
+  dotActive: { borderColor: "#1EBA8D", backgroundColor: "#ECFDF5" },
+  dotInactive: { borderColor: "#D1D5DB" },
+  connector: {
+    height: 40,
+    width: 2,
+    backgroundColor: "#E5E7EB",
+    marginTop: 6,
+  },
+  title: { fontSize: 15, color: "#6B7280", paddingLeft: 12 },
 });

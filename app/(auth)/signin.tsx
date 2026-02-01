@@ -7,7 +7,7 @@ import {
   StatusBar,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 import { InputFields } from "@/components/form/formInput";
@@ -100,6 +100,7 @@ const SignIn: React.FC = () => {
       const data = await response.json();
 
       setMessage(data?.message || "");
+      console.error(data.user.expoPushToken)
       setShowNotification(true);
 
       if (response.ok) {

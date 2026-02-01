@@ -193,7 +193,7 @@ export default function OrderStatus() {
 
 // ================= STYLES =================
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "white" },
+  safeArea: { flex: 1, backgroundColor: "white", paddingBottom:50 },
   container: { padding: 16, paddingBottom: 80 }, // ensure content doesn't overlap nav bar
   orderCard: {
     borderWidth: 1,

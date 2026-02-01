@@ -34,10 +34,10 @@ const user = useAppStore((state) => state.user);
   <Stack.Screen name="trackOrder" 
   options={{
     headerShown: true,
-    headerShadowVisible: true,
+    headerShadowVisible: false,
     headerTitle: "Trcak Order",
     headerLeft: () => (
-      <TouchableOpacity  onPress={() => router.back()} style={{ paddingHorizontal: 10 }}>
+      <TouchableOpacity  onPress={() => router.back()} style={{ paddingHorizontal: 5 }}>
         <MaterialIcons name="chevron-left" size={28} />
       </TouchableOpacity>
     ),
@@ -61,7 +61,7 @@ const user = useAppStore((state) => state.user);
     headerShadowVisible: false,
     headerTitle: "Order Status",
     headerLeft: () => (
-      <TouchableOpacity  onPress={() => router.back()} style={{ paddingHorizontal: 10 }}>
+      <TouchableOpacity  onPress={() => router.back()} style={{ paddingHorizontal: 5 }}>
         <MaterialIcons name="chevron-left" size={28} />
       </TouchableOpacity>
     ),

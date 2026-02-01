@@ -1,9 +1,9 @@
 import { useAppStore } from "@/app/store/useAppStore";
 import { Ionicons } from '@expo/vector-icons';
 import { router } from "expo-router";
-import { ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { useEffect } from "react";
+import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ProgressBar } from '../../components/progressBar';
 import "../../global.css";
 
 
@@ -20,6 +20,15 @@ const handleFinish = async () => {
   await completeOnboarding();
   router.replace("/(auth)/signin");
 };
+
+  useEffect(() => {
+    return () => {
+      if (!hasCompletedOnboarding) {
+        completeOnboarding();
+      }
+    };
+  }, [hasCompletedOnboarding]);
+
 
   // Redirect if user exists
 //   if (user.username !== '') return <Redirect href="/rider" />;
@@ -68,9 +77,18 @@ const style = StyleSheet.create({
   {/* Helper Text */}
 
 </View>
+            <View className="w-full space-y-4 gap-3">
 
-
-          <ProgressBar index={2} mylink="/(auth)/signin" value={100} action={()=>handleFinish}/>
+ <TouchableOpacity
+                onPress={handleFinish}
+                className="bg-[#1EBA8D] py-3 rounded-full items-center"
+              >
+                <Text className="text-white font-bold text-[16px]">
+                  Continue to sign in
+                </Text>
+              </TouchableOpacity>
+              </View>
+          {/* <ProgressBar index={2} mylink="" value={100} action={() => handleFinish()}/> */}
         </SafeAreaView>
       </ScrollView>
     </>
