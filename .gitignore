@@ -2,7 +2,8 @@
 
 # dependencies
 node_modules/
-
+google-services.json
+product-authe-firebase-adminsdk-lgvof-a7913a22b1.json
 # Expo
 .expo/
 dist/
