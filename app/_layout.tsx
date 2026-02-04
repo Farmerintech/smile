@@ -28,6 +28,7 @@ import * as SplashScreen from "expo-splash-screen";
 
 import {
   handleNotificationNavigation,
+  registerForPushNotifications,
   setupAndroidChannel,
   setupNotificationHandler,
 } from "@/app/lib/pushNotifications";
@@ -84,6 +85,9 @@ function PushNavigationHandler() {
 
   return null;
 }
+useEffect(() => {
+  registerForPushNotifications();
+}, []);
 
 /* ================================
    🚀 ROOT LAYOUT

@@ -77,7 +77,7 @@ const style = StyleSheet.create({
   {/* Helper Text */}
 
 </View>
-            <View className="w-full space-y-4 gap-3">
+            <View className="w-full space-y-4 gap-3 px-6">
 
  <TouchableOpacity
                 onPress={handleFinish}

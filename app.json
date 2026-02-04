@@ -3,11 +3,17 @@
     "name": "Smile",
     "slug": "smile",
     "version": "1.0.0",
+
     "orientation": "portrait",
-    "icon": "./assets/images/cart.png",
     "scheme": "smile",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+
+    "icon": "./assets/notification-icon.png",
+
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
 
     "ios": {
       "supportsTablet": true
@@ -15,47 +21,43 @@
 
     "android": {
       "package": "com.farmerintech.smile",
+      "googleServicesFile": "./google-services.json",
       "edgeToEdgeEnabled": true,
+
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/notification-icon.png",
         "backgroundColor": "#093131"
-      },
-      "googleServicesFile": "./google-services.json"
+      }
     },
 
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/favicon.png"
     },
 
     "plugins": [
       "expo-router",
       "expo-secure-store",
       "expo-font",
+
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/cart.png",
-          "imageWidth": 200,
+          "image": "./assets/notification-icon.png",
           "resizeMode": "contain",
           "backgroundColor": "#093131"
         }
       ],
+
       [
         "expo-notifications",
-
         {
-          "icon": "./assets/images/yakub.jpg",
-          "color": "#093131",
-          "defaultChannel": "default",
-          "sounds": [
-            "./assets/sounds/notification.mp3"
-          ],
-          "enableBackgroundRemoteNotifications": false
+          "icon": "./assets/notification-icon.png",
+          "color": "#ffffff",
+          "defaultChannel": "default"
         }
       ]
-      
     ],
 
     "experiments": {

@@ -10,59 +10,81 @@ export type PushNavigationData = {
 
 /* ================================
    🔔 FOREGROUND HANDLER
+   - Android uses shouldShowAlert
+   - iOS needs banner/list flags for typing
 ================================*/
 export function setupNotificationHandler() {
   Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowBanner: true,
-      shouldShowList: true,
+    handleNotification: async (): Promise<Notifications.NotificationBehavior> => ({
+      shouldShowAlert: true,     // ✅ ANDROID POPUP
       shouldPlaySound: true,
       shouldSetBadge: true,
+
+      // iOS-only, but REQUIRED for TS
+      shouldShowBanner: true,
+      shouldShowList: true
     }),
   });
 }
 
 /* ================================
    📢 ANDROID CHANNEL
+   - SINGLE source of truth
+   - MAX importance = heads-up popup
 ================================*/
 export async function setupAndroidChannel() {
-  if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync("default", {
-      name: "default",
-      importance: Notifications.AndroidImportance.MAX,
-      sound: "default",
-      vibrationPattern: [0, 250, 250, 250],
-    });
-  }
+  if (Platform.OS !== "android") return;
+
+ await Notifications.setNotificationChannelAsync("default", {
+  name: "default",
+  importance: Notifications.AndroidImportance.MAX,
+  sound: "default",
+  vibrationPattern: [0, 250, 250, 250],
+  lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+  enableVibrate: true
+});
 }
 
 /* ================================
    📲 REGISTER FOR PUSH
 ================================*/
 export async function registerForPushNotifications() {
-  if (!Device.isDevice) return null;
-
-  const { status } = await Notifications.getPermissionsAsync();
-  if (status !== "granted") {
-    const req = await Notifications.requestPermissionsAsync();
-    if (req.status !== "granted") return null;
+  if (!Device.isDevice) {
+    console.log("Must use physical device for Push Notifications");
+    return null;
   }
 
-  const projectId =
-    Constants.expoConfig?.extra?.eas?.projectId ??
-    Constants.easConfig?.projectId;
+  // 1. Android 13+ specific permission check
+  if (Platform.OS === 'android') {
+    await setupAndroidChannel(); // Ensure channel exists before requesting permission
+  }
 
-  if (!projectId) return null;
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
 
-  const token = (
-    await Notifications.getExpoPushTokenAsync({ projectId })
-  ).data;
+  if (existingStatus !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
 
-  return token;
-}
+  if (finalStatus !== 'granted') {
+    alert('Failed to get push token for push notification!');
+    return null;
+  }
 
-/* ================================
+  // 2. Fetch the token with the ProjectID
+  const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+  
+  try {
+    const token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+    return token;
+  } catch (e) {
+    console.error("Error fetching push token", e);
+    return null;
+  }
+}/* ================================
    🧭 HANDLE NOTIFICATION TAP
+   - Prevents Expo Go hijacking
 ================================*/
 export function handleNotificationNavigation(
   data: PushNavigationData,
@@ -73,7 +95,8 @@ export function handleNotificationNavigation(
     return;
   }
 
-  if (data.url) {
+  // Only allow YOUR scheme
+  if (data.url?.startsWith("smile://")) {
     Linking.openURL(data.url);
   }
 }

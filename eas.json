@@ -9,16 +9,29 @@
 //       "distribution": "internal"
 //     },
 //     "preview": {
-//       "distribution": "internal"
+//       "distribution": "internal",
+//       "android": {
+//         "buildType": "apk",
+//         "env": {
+//           "ANDROID_GOOGLE_SERVICES_FILE": "@file:ANDROID_GOOGLE_SERVICES_FILE"
+//         }
+//       }
 //     },
 //     "production": {
-//       "autoIncrement": true
+//       "autoIncrement": true,
+//       "android": {
+//         "buildType": "app-bundle",
+//         "env": {
+//           "ANDROID_GOOGLE_SERVICES_FILE": "@file:ANDROID_GOOGLE_SERVICES_FILE"
+//         }
+//       }
 //     }
 //   },
 //   "submit": {
 //     "production": {}
 //   }
 // }
+
 
 {
   "cli": {
@@ -31,7 +44,6 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
       "android": {
         "buildType": "apk"
       }
@@ -42,8 +54,5 @@
         "buildType": "app-bundle"
       }
     }
-  },
-  "submit": {
-    "production": {}
   }
 }
