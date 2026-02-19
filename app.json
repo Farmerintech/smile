@@ -7,7 +7,7 @@
     "orientation": "portrait",
     "scheme": "smile",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
 
     "icon": "./assets/notification-icon.png",
 

@@ -190,7 +190,7 @@ screenOptions={{
       <Tabs.Screen
         name="order"
         options={{
-          title: 'Orders',
+          title: 'My Orders',
           headerShown: false,
           headerStyle: {
             backgroundColor: '#093131',

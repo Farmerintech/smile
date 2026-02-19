@@ -115,7 +115,7 @@ const SignIn: React.FC = () => {
 
       }
     } catch (err) {
-      setMessage("Network error. Please try again.");
+      // setMessage("");
       setShowNotification(true);
     } finally {
       setLoading(false);

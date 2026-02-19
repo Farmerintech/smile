@@ -1,5 +1,3 @@
-import CountrySelectWithInput from "@/components/countries";
-import { InputFields } from "@/components/form/formInput";
 import { router } from "expo-router";
 import Joi from "joi";
 import React, { useState } from "react";
@@ -7,11 +5,13 @@ import {
   Platform,
   SafeAreaView,
   StatusBar,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { TextInput } from "react-native-paper";
 
 import { NotificationBar } from "@/components/NotificationBar";
 import "../../global.css";
@@ -20,7 +20,8 @@ import { BaseURL } from "../lib/api";
 /* ===================== TYPES ===================== */
 interface FormData {
   phoneNumber: string;
-  username: string;
+  lastName: string;
+  firstName:string;
   email: string;
   password: string;
 }
@@ -36,10 +37,12 @@ const signUpSchema = Joi.object<FormData>({
       "string.pattern.base": "Phone number must contain only digits",
     }),
 
-  username: Joi.string().min(2).required().messages({
-    "string.empty": "Username is required",
+  firstName: Joi.string().min(2).required().messages({
+    "string.empty": "First name is required",
   }),
-
+ lastName: Joi.string().min(2).required().messages({
+    "string.empty": "Last name is required",
+  }),
   email: Joi.string()
     .email({ tlds: { allow: false } })
     .required()
@@ -58,7 +61,8 @@ const signUpSchema = Joi.object<FormData>({
 const SignUp: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     phoneNumber: "",
-    username: "",
+    firstName: "",
+    lastName:"",
     email: "",
     password: "",
   });
@@ -103,7 +107,7 @@ const SignUp: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${BaseURL}/auth/registeration`, {
+      const response = await fetch(`${BaseURL}/auth/user/registeration`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -122,7 +126,7 @@ const SignUp: React.FC = () => {
         router.push("/(auth)/signin");
       }
     } catch (err) {
-      setMessage("Network error. Please try again.");
+      // setMessage(msg);
       setShowNotification(true);
     } finally {
       setLoading(false);
@@ -173,44 +177,52 @@ const SignUp: React.FC = () => {
           <Text>{message}</Text>
 
           {/* Phone */}
-          <CountrySelectWithInput
+          <Input
+            label="Phone number"
+            icon="call"
             value={formData.phoneNumber}
-            onChange={(text: string) => handleFormChange("phoneNumber", text)}
-            error={error.phoneNumber}
+            onChangeText={(v:any) => handleFormChange("phoneNumber", v)}
           />
 
           <View className="flex gap-4 mt-4">
-            <InputFields
-              placeHolder="Email"
+            <Input
+              label="Email"
               value={formData.email}
-              action={(v: string) => handleFormChange("email", v)}
+              onChangeText={(v: string) => handleFormChange("email", v)}
               icon="mail"
               error={error.email}
               name="mail"
             />
 
-            <InputFields
-              placeHolder="Username"
-              value={formData.username}
-              action={(v: string) => handleFormChange("username", v)}
+            <Input
+              label="First name"
+              value={formData.firstName}
+              onChangeText={(v: string) => handleFormChange("firstName", v)}
               icon="person"
-              error={error.username}
+              error={error.firstName}
               name="username"
             />
-
-            <InputFields
-              placeHolder="Password"
+  <Input
+              label="Last name"
+              value={formData.lastName}
+              onChangeText={(v: string) => handleFormChange("lastName", v)}
+              icon="person"
+              error={error.lastName}
+              name="username"
+            />
+            <Input
+              label="Password"
               value={formData.password}
-              action={(v: string) => handleFormChange("password", v)}
+              onChangeText={(v: string) => handleFormChange("password", v)}
               icon="key"
               error={error.password}
               name="password"
             />
 
-            <InputFields
-              placeHolder="Confirm password"
+            <Input
+              label="Confirm password"
               value={confirmPassword}
-              action={(v: string) => setConfirmPassword(v)}
+              onChangeText={(v: string) => setConfirmPassword(v)}
               icon="key"
               error={error.confirmPassword}
               name="cpsw"
@@ -244,3 +256,100 @@ const SignUp: React.FC = () => {
 };
 
 export default SignUp;
+
+
+
+export const Input = (props:any) => (
+  <TextInput
+    mode="outlined"
+    style={styles.input}
+    activeOutlineColor="#2c5364"
+    theme={{ roundness: 12 }}
+    {...props}
+  />
+);
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    padding: 20,
+  },
+
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 25,
+    padding: 25,
+    marginTop: 40,
+    elevation: 8,
+  },
+
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    textAlign: "center",
+    color: "#2c5364",
+  },
+
+  subtitle: {
+    textAlign: "center",
+    color: "#777",
+    marginBottom: 25,
+  },
+
+  input: {
+    marginBottom: 15,
+    backgroundColor: "#fff",
+  },
+
+  btn: {
+    backgroundColor: "#2c5364",
+    padding: 15,
+    borderRadius: 12,
+    marginTop: 10,
+  },
+
+  btnText: {
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "600",
+  },
+
+  /* Modal */
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  modalBox: {
+    width: "80%",
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    padding: 20,
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 15,
+    textAlign: "center",
+  },
+
+  modalItem: {
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+
+  modalText: {
+    fontSize: 16,
+  },
+
+  modalCancel: {
+    marginTop: 10,
+    alignItems: "center",
+  },
+});
+
+

@@ -81,7 +81,7 @@ const style = StyleSheet.create({
 
  <TouchableOpacity
                 onPress={handleFinish}
-                className="bg-[#1EBA8D] py-3 rounded-full items-center"
+                className="bg-[#1EBA8D] w-full py-3 rounded-full items-center"
               >
                 <Text className="text-white font-bold text-[16px]">
                   Continue to sign in

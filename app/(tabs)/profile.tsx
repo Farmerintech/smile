@@ -6,7 +6,6 @@ import React, { useState } from "react";
 import { useStatusBar } from "@/hooks/statusBar";
 import { router } from "expo-router";
 import {
-  Image,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -86,7 +85,7 @@ const SignIn: React.FC = () => {
       </View>
       <View className="flex items-center flex-row justify-between px-5 mb-5">
        <View className="flex flex-1 flex-row items-center justify-start gap-3 ">
-         <View className="">
+         {/* <View className="">
               <Image
             source={yakub}
             style={{
@@ -101,7 +100,7 @@ const SignIn: React.FC = () => {
               shadowRadius: 5,
             }}
           />
-        </View>
+        </View> */}
         <View className="flex items-start flex-wrap flex-1">
           <AppTextBold className="text-[28px] text-white text-center mb-2">
            {user.username}
