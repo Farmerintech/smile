@@ -2,13 +2,13 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { router, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    Pressable,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    View,
+  ActivityIndicator,
+  Image,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  View,
 } from "react-native";
 
 import { AppText } from "../_layout";

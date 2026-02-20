@@ -1,7 +1,7 @@
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Tabs, useRouter } from 'expo-router';
-import { GestureResponderEvent, Image, StyleProp, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { GestureResponderEvent, StyleProp, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import "../../global.css";
 import { AppText } from '../_layout';
@@ -75,14 +75,14 @@ screenOptions={{
             // height: 70,
           },
           headerTitle: () => (
-            <View className=" pt-4">
+            <View className=" pt-4 pl-5">
               <View
                 className="flex-row items-center justify-between mb-2"
-                style={{ gap: 30 }}
+                style={{ gap: 80 }}
               >
                 <View className="flex-row items-center justify-between mb-2"
                 style={{ gap: 10 }}>
-                <Image
+                {/* <Image
             source={yakub}
             style={{
               width: 50,
@@ -95,14 +95,14 @@ screenOptions={{
               shadowOpacity: 0.3,
               shadowRadius: 5,
             }}
-          />
+          /> */}
                 {/* Greeting */}
                 <View>
                   <AppText
                     className="text-[16px] font-bold"
                     style={{ color: "#1A1A1A" }}
                   >
-                    Hello, {user?.username} 👋
+                    Hello, {user?.firstName} 👋
                   </AppText>
                   <Text className="text-[14px]" style={{ color: "#6B7280" }}>
                     What can we help you find?

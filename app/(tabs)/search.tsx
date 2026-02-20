@@ -1,191 +1,136 @@
 // screens/Search.tsx
-import { data } from "@/components/data";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import "../../global.css";
 import { AppText } from "../_layout";
+import { BaseURL } from "../lib/api";
+import { useAppStore } from "../store/useAppStore";
 
-const items = [
-  "All",
-  "Resturants",
-  "Pharmacies",
-  "Supermarket",
-  "Local Markets",
-  "Packages",
-  "Lugage",
-  "More",
-];
 
 const Search = () => {
-  const [index, setIndex] = useState(0);
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [img, setImg] = useState<any>();
-  const [price, setPrice] = useState<number>();
+  const { user } = useAppStore();
+  const params = useLocalSearchParams();
+const keywordFromParams = Array.isArray(params.keyword) 
+  ? params.keyword[0] 
+  : params.keyword || "";
+  const [search, setSearch] = useState(keywordFromParams);
+  const [stores, setStores] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleModalOpen = (item: any, price: number) => {
-    setImg(item);
-    setModalVisible(true);
-    setPrice(price);
+  // 🔎 Search API call
+  const fetchSearch = async (keyword: string) => {
+    if (!keyword.trim()) {
+      setStores([]);
+      setProducts([]);
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const token = user?.token;
+      const res = await fetch(`${BaseURL}/products/search?keyword=${encodeURIComponent(keyword)}`, {
+        method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // 👈 required
+      },
+        
+      });
+
+      const json = await res.json();
+
+      if (json.success) {
+  setStores(json.data.stores || []);
+  setProducts(json.data.products || []);
+}
+    } catch (err) {
+      console.log("Search error", err);
+      setStores([]);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // 🔎 Trigger search when typing (debounced)
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      fetchSearch(search);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [search]);
+
+  // 🔎 Trigger search if navigated from a vendor
+  useEffect(() => {
+    if (keywordFromParams) {
+      fetchSearch(keywordFromParams);
+    }
+  }, [keywordFromParams]);
+
+  // Merge results for FlatList
+  const mergedResults = [
+    ...stores.map((s) => ({ ...s, type: "store" })),
+    ...products.map((p) => ({ ...p, type: "product" })),
+  ];
+
   return (
-    <>
-      <View style={{ flex: 1, backgroundColor: "#F9FAFB", paddingTop:40 }}>
+    <View style={{ flex: 1, backgroundColor: "#F9FAFB", paddingTop: 40 }}>
+      {/* Search Bar */}
+      <View style={{ paddingHorizontal: 18 }}>
+        <View
+          className="flex-row items-center shadow rounded-[20px] px-4 py-3 mb-4"
+          style={{ backgroundColor: "#F1F5F9" }}
+        >
+          <Ionicons name="search-outline" size={20} color="#6B7280" />
+
+          <TextInput
+            className="flex-1 mx-3 text-[15px]"
+            placeholder="Search vendors or products..."
+            placeholderTextColor="#9CA3AF"
+            value={search}
+            onChangeText={setSearch}
+            style={{ color: "#1A1A1A" }}
+          />
+
+          {search.length > 0 && (
+            <TouchableOpacity onPress={() => setSearch("")}>
+              <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+
+      {/* Results */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#FF6B35" />
+      ) : (
         <FlatList
-          data={data}
-          keyExtractor={(item) => item.storeId.toString()}
-          showsVerticalScrollIndicator={false}
-          stickyHeaderIndices={[0]}
-          contentContainerStyle={{
-            paddingBottom: 150,
-            
-          }}
+          data={mergedResults}
+          keyExtractor={(item, index) => `${item.type}-${item.id}-${index}`}
           ListHeaderComponent={
-            <View style={{ backgroundColor: "#F9FAFB" }}>
-              {/* Search + Filters */}
-              <View
-                style={{
-                  paddingHorizontal: 18,
-                  paddingTop: 10,
-                  backgroundColor: "#F9FAFB",
-                }}
-              >
-                {/* Search Input */}
-                <View
-  className="flex-row items-center shadow rounded-[20px] px-4 py-3 mb-4"
-  style={{
-    backgroundColor: "#F1F5F9", // inputBackground
-  }}
->
-  {/* Search Icon */}
-  <Ionicons
-    name="search-outline"
-    size={20}
-    color="#6B7280" // textSecondary
-  />
-
-  {/* Input */}
-  <TextInput
-    className="flex-1 mx-3 text-[15px]"
-    placeholder="Search vendors around you..."
-    placeholderTextColor="#9CA3AF" // textMuted
-    onChangeText={() => {}}
-    value=""
-    style={{
-      color: "#1A1A1A", // textPrimary
-    }}
-  />
-
-  {/* Filter Button */}
-  <TouchableOpacity
-    activeOpacity={0.85}
-    className="h-10 w-10 items-center justify-center rounded-full"
-    style={{
-      backgroundColor: "#FF6B35", // primaryOrange
-    }}
-  >
-    <Ionicons
-      name="options-outline"
-      size={18}
-      color="#FFFFFF"
-    />
-  </TouchableOpacity>
-</View>
-
-                {/* Category Pills */}
-                <FlatList
-                  data={items}
-                  keyExtractor={(item) => item}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{
-                    gap: 8,
-                    paddingVertical: 14,
-                  }}
-                  renderItem={({ item, index: i }) => {
-                    const active = index === i;
-
-                    return (
-                      <TouchableOpacity
-                        onPress={() => setIndex(i)}
-                        style={{
-                          paddingHorizontal: 14,
-                          height: 32,
-                          borderRadius: 16,
-                          backgroundColor: active ? "#FF6B35" : "#FFFFFF",
-                          borderWidth: 1,
-                          borderColor: active ? "#FF6B35" : "#E5E7EB",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      >
-                        <AppText
-                          style={{
-                            fontSize: 13,
-                            fontWeight: "500",
-                            color: active ? "#FFFFFF" : "#6B7280",
-                          }}
-                        >
-                          {item}
-                        </AppText>
-                      </TouchableOpacity>
-                    );
-                  }}
-                />
+            search ? (
+              <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
+                <AppText style={{ fontSize: 14 }}>
+                  {mergedResults.length} Results for "{search}"
+                </AppText>
               </View>
-
-              {/* Results Header */}
-              <View
-                style={{
-                  paddingHorizontal: 16,
-                  paddingVertical: 12,
-                  backgroundColor: "#FFFFFF",
-                  marginTop: 6,
-                  borderTopLeftRadius: 16,
-                  borderTopRightRadius: 16,
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <AppText
-                    style={{
-                      fontSize: 15,
-                      fontWeight: "500",
-                      color: "#1A1A1A",
-                    }}
-                  >
-                    25 Results for "Chicken"
-                  </AppText>
-
-                  <TouchableOpacity>
-                    <AppText
-                      style={{
-                        fontSize: 14,
-                        fontWeight: "500",
-                        color: "#FF6B35",
-                      }}
-                    >
-                      Clear Search
-                    </AppText>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
+            ) : null
           }
           renderItem={({ item }) => (
-            <View
+            <TouchableOpacity
+              activeOpacity={0.9}
               style={{
                 backgroundColor: "#FFFFFF",
                 paddingHorizontal: 16,
@@ -194,77 +139,70 @@ const Search = () => {
                 borderBottomColor: "#E5E7EB",
                 flexDirection: "row",
                 alignItems: "center",
-                justifyContent: "space-between",
+                borderRadius: item.type === "store" ? 12 : 0,
+                marginBottom: item.type === "store" ? 12 : 0,
+              }}
+              onPress={() => {
+                if (item.type === "store") {
+                  // Navigate to search with vendor name
+                  router.push(`/search?keyword=${encodeURIComponent(item.name)}`);
+                } else {
+                  // Optionally handle product click
+                }
               }}
             >
               {/* Image */}
-              <View
-                style={{
-                  width: 60,
-                  height: 60,
-                  justifyContent: "center",
-                  alignItems: "center",
+              <Image
+                source={{
+                  uri:
+                    item.type === "store"
+                      ? item.coverImage || "https://via.placeholder.com/50"
+                      : item.imageUrl || "https://via.placeholder.com/50",
                 }}
-              >
-                <Image
-                  source={item.imageUrl}
-                  style={{
-                    width: 50,
-                    height: 50,
-                    resizeMode: "cover",
-                    borderRadius: 12,
-                  }}
-                />
-              </View>
+                style={{ width: 50, height: 50, borderRadius: 12 }}
+              />
 
               {/* Info */}
-              <TouchableOpacity
-                style={{ flex: 1, marginLeft: 10 }}
-                onPress={() => {
-                  handleModalOpen(item.imageUrl, item.price);
-                }}
-              >
+              <View style={{ marginLeft: 12, flex: 1 }}>
                 <AppText
                   style={{
                     fontSize: 15,
                     fontWeight: "500",
-                    color: "#1A1A1A",
                   }}
                 >
-                  Chicken Republic - {item.name}
+                  {item.name}
                 </AppText>
 
-                <AppText
-                  style={{
-                    fontSize: 13,
-                    marginTop: 2,
-                    color: "#6B7280",
-                  }}
-                >
-                  From ₦{item.price} · 12m ride
-                </AppText>
-              </TouchableOpacity>
+                {item.type === "product" && (
+                  <AppText
+                    style={{
+                      fontSize: 13,
+                      marginTop: 2,
+                      color: "#6B7280",
+                    }}
+                  >
+                    ₦{item.price}
+                  </AppText>
+                )}
+              </View>
 
-              {/* Favorite */}
               <MaterialIcons
                 name="favorite-outline"
                 size={22}
                 color="#9CA3AF"
               />
-            </View>
+            </TouchableOpacity>
           )}
+          ListEmptyComponent={
+            search ? (
+              <View style={{ alignItems: "center", marginTop: 40 }}>
+                <AppText>No results found</AppText>
+              </View>
+            ) : null
+          }
         />
-      </View>
-
-      {/* Cart Modal
-      <CartModal
-        visible={isModalVisible}
-        onRequestClose={() => setModalVisible(false)}
-        source={img}
-        price={price || 0}
-        count={0}
-      /> */}
-    </>
+      )}
+    </View>
   );
 };
 

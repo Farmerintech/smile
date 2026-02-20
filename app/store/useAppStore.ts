@@ -35,7 +35,8 @@ type LocationType = {
 
 type User = {
   id: string;
-  username: string;
+  firstName: string;
+  lastName?:string
   email: string;
   isLoggedIn: boolean;
   token?: string;
@@ -66,7 +67,7 @@ type AppState = {
 
 const defaultUser: User = {
   id: "",
-  username: "",
+  firstName: "",
   email: "",
   isLoggedIn: false,
   addresses: [],

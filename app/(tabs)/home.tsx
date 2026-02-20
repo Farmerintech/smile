@@ -1,5 +1,4 @@
 import { CartModal } from "@/components/cartModal";
-import { data } from "@/components/data";
 import LoginGuard from "@/components/loginGuard";
 import { registerForPushNotificationsAsync } from "@/hooks/notifications";
 import { useStatusBar } from "@/hooks/statusBar";
@@ -64,7 +63,7 @@ const items = [
   },
 ]
 const Home = () => {
-const { addToCart } = useAppStore();
+  const { addToCart } = useAppStore();
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
@@ -105,69 +104,69 @@ const { addToCart } = useAppStore();
   const handleAddToCart = () => {
     if (!selectedItem) return;
 
-  addToCart({
-  id: selectedItem.id,
-  // productId: selectedItem.id, // optional if you want both id & productId
-  name: selectedItem.name,
-  description: selectedItem.description,
-  price: selectedItem.price,
-  category: selectedItem.category,
-  imageUrl: selectedItem.imageUrl,
-  storeId: selectedItem.storeId,
-  isAvailable: selectedItem.isAvailable,
-  createdAt: selectedItem.createdAt,
-  updatedAt: selectedItem.updatedAt,
-  quantity: itemCounts[selectedItem.id] || 1, // quantity is the extra property
-});
+    addToCart({
+      id: selectedItem.id,
+      // productId: selectedItem.id, // optional if you want both id & productId
+      name: selectedItem.name,
+      description: selectedItem.description,
+      price: selectedItem.price,
+      category: selectedItem.category,
+      imageUrl: selectedItem.imageUrl,
+      storeId: selectedItem.storeId,
+      isAvailable: selectedItem.isAvailable,
+      createdAt: selectedItem.createdAt,
+      updatedAt: selectedItem.updatedAt,
+      quantity: itemCounts[selectedItem.id] || 1, // quantity is the extra property
+    });
 
 
     setModalVisible(false);
     sendTestNotification()
 
   };
-  
-   const {user} = useAppStore();
-    useEffect(()=>{
-      if(!user || user.email===''){
-        router.replace("/(auth)/signin")
-      }
-    })
 
-useEffect(() => {
-  (async () => {
-    try {
-      const token = await registerForPushNotificationsAsync();
-      if (token) {
-        // console.error("TOKEN FROM SCREEN:", token);
-      }
-    } catch (err) {
-      console.log("Push registration failed:", err);
+  const { user } = useAppStore();
+  useEffect(() => {
+    if (!user || user.email === '') {
+      router.replace("/(auth)/signin")
     }
-  })();
-}, []);
+  })
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const token = await registerForPushNotificationsAsync();
+        if (token) {
+          // console.error("TOKEN FROM SCREEN:", token);
+        }
+      } catch (err) {
+        console.log("Push registration failed:", err);
+      }
+    })();
+  }, []);
 
 
   async function sendTestNotification() {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: `Cart Updated`,
-      body: `${selectedItem.name} added to cart`,
-      sound: "default",
-      //    data: {
-      //   url: `/order` // deep link to a route in your app
-      // },
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-      seconds: 3,
-    },
-  });
-}
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: `Cart Updated`,
+        body: `${selectedItem.name} added to cart`,
+        sound: "default",
+        //    data: {
+        //   url: `/order` // deep link to a route in your app
+        // },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: 3,
+      },
+    });
+  }
   const { width } = Dimensions.get("window");
 
   const cardWidth = width * 0.45;
- useStatusBar("white", "dark-content");
- const pathname = usePathname();
+  useStatusBar("white", "dark-content");
+  const pathname = usePathname();
 
   useFocusEffect(
     useCallback(() => {
@@ -191,9 +190,9 @@ useEffect(() => {
       return () => sub.remove();
     }, [pathname])
   );
-   const [loading, setLoading] = useState(true);
-   const [products, setProducts] = useState()
-   const fetchProducts = async () => {
+  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState()
+  const fetchProducts = async () => {
     // Alert.alert(storeId)
     // console.log(storeId)
     try {
@@ -207,22 +206,59 @@ useEffect(() => {
       setLoading(false);
     }
   };
+  const [productStore, setProductStore] = useState([])
+const fetchProductStores = async () => {
+  try {
+    setLoading(true);
 
+    const token = user?.token; // get token from store
+
+    const res = await fetch(`${BaseURL}/products/get_store_products`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // 👈 required
+      },
+    });
+
+    if (res.status === 401) {
+      console.log("Unauthorized! Token might be invalid.");
+      setProductStore([]);
+      return;
+    }
+
+    const json = await res.json();
+
+    if (json.success && Array.isArray(json.data)) {
+      setProductStore(json.data);
+    } else {
+      setProductStore([]);
+    }
+  } catch (err) {
+    console.log("Fetch products error:", err);
+    setProductStore([]);
+  } finally {
+    setLoading(false);
+  }
+};
   useEffect(() => {
     fetchProducts();
+    fetchProductStores()
   }, []);
 
-
+const navigateToSearch = (vendorName: string) => {
+  router.push(`/search?keyword=${encodeURIComponent(vendorName)}`);
+};
 
   return (
     <LoginGuard>
-     <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
-  <ScrollView
-  showsVerticalScrollIndicator={false}
-  keyboardShouldPersistTaps="handled"
-  contentContainerStyle={{ paddingBottom: 0 }}
-  contentInsetAdjustmentBehavior="automatic"
->
+      <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ paddingBottom: 0 }}
+          contentInsetAdjustmentBehavior="automatic"
+        >
 
           {/* <StatusBar backgroundColor={"white"} barStyle={"dark-content"}/> */}
           <View className="w-full p-4 ">
@@ -325,201 +361,203 @@ useEffect(() => {
                 >
                   See all
                 </AppTextBold>
-                <Ionicons name="chevron-forward"  color= "#FF6B35" size={20} />
+                <Ionicons name="chevron-forward" color="#FF6B35" size={20} />
               </TouchableOpacity>
             </View>
 
 
-<ScrollView
-  refreshControl={
-    <RefreshControl
-      refreshing={loading}
-      onRefresh={fetchProducts}
-      tintColor="#FF6B35"
-    />
-  }
->
-  <FlatList
-    data={products}
-    keyExtractor={(item) => item.id}
-    horizontal
-    showsHorizontalScrollIndicator={false}
-    contentContainerStyle={{ gap: 16, paddingVertical: 10 }}
-    renderItem={({ item }) => (
-      <TouchableOpacity
-        onPress={() => openModal(item)}
-        activeOpacity={0.9}
-        className="rounded-[20px]"
-        style={{
-          width: 260,
-          backgroundColor: "#FFFFFF",
-          shadowColor: "#000",
-          shadowOpacity: 0.08,
-          shadowRadius: 10,
-          shadowOffset: { width: 0, height: 6 },
-          elevation: 4,
-        }}
-      >
-        {/* Image */}
-        <View className="relative">
-          <Image
-            source={{ uri: item.imageUrl }}
-            style={{
-              width: "100%",
-              height: 140,
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
-            }}
-          />
-
-          {/* Favorite */}
-          <TouchableOpacity
-            className="absolute top-3 right-3 h-9 w-9 rounded-full items-center justify-center"
-            style={{ backgroundColor: "#FFFFFF" }}
-          >
-            <MaterialIcons
-              name="favorite"
-              size={18}
-              color="#EF4444"
-            />
-          </TouchableOpacity>
-        </View>
-
-        {/* Content */}
-        <View className="px-4 py-3">
-          <Text
-            numberOfLines={1}
-            className="text-[16px] font-semibold mb-1"
-            style={{ color: "#1A1A1A" }}
-          >
-            {item.name}
-          </Text>
-
-          {/* Rating */}
-          <View className="flex-row items-center mb-2">
-            <Ionicons name="star" size={14} color="#FACC15" />
-            <Text className="text-[13px] ml-1 mr-2" style={{ color: "#1A1A1A" }}>
-              4.9
-            </Text>
-            <Text className="text-[13px]" style={{ color: "#6B7280" }}>
-              25–35 min · Italian
-            </Text>
-          </View>
-
-          {/* Chips */}
-          <View className="flex-row items-center gap-2">
-            <View
-              className="flex-row items-center px-2 py-1 rounded-full"
-              style={{ backgroundColor: "#FFE7DC" }}
+            <ScrollView
+              refreshControl={
+                <RefreshControl
+                  refreshing={loading}
+                  onRefresh={fetchProducts}
+                  tintColor="#FF6B35"
+                />
+              }
             >
-              <Ionicons name="restaurant" size={12} color="#FF6B35" />
-              <Text className="ml-1 text-[12px]" style={{ color: "#FF6B35" }}>
-                Meals
-              </Text>
-            </View>
-
-            <View className="flex-row items-center">
-              <Ionicons name="bicycle" size={14} color="#2E8B6D" />
-              <Text className="ml-1 text-[12px]" style={{ color: "#2E8B6D" }}>
-                1.3 km
-              </Text>
-            </View>
-          </View>
-        </View>
-      </TouchableOpacity>
-    )}
-  />
-</ScrollView>
-          </View>
-          <View className="px-5 py-4">
-            <Text
-              className="text-[20px] font-bold mb-3"
-              style={{ color: "#1A1A1A" }}
-            >
-              Vendors Near You
-            </Text>
-
-            {data.map((item) => (
-              <TouchableOpacity
-             onPress={() => openModal(item)}
-                key={item.storeId}
-                activeOpacity={0.9}
-                className="mb-5"
-                style={{
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: 20,
-                  shadowColor: "#000",
-                  shadowOpacity: 0.08,
-                  shadowRadius: 10,
-                  shadowOffset: { width: 0, height: 6 },
-                  elevation: 4,
-                }}
-              >
-                {/* Image */}
-                <View className="relative">
-                  <Image
-                    source={item.imageUrl}
-                    style={{
-                      width: "100%",
-                      height: 180,
-                      borderTopLeftRadius: 20,
-                      borderTopRightRadius: 20,
-                    }}
-                  />
-
+              <FlatList
+                data={products}
+                keyExtractor={(item) => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: 16, paddingVertical: 10 }}
+                renderItem={({ item }) => (
                   <TouchableOpacity
-                    className="absolute top-3 right-3 h-9 w-9 rounded-full items-center justify-center"
-                    style={{ backgroundColor: "#FFFFFF" }}
+                    onPress={() => openModal(item)}
+                    activeOpacity={0.9}
+                    className="rounded-[20px]"
+                    style={{
+                      width: 260,
+                      backgroundColor: "#FFFFFF",
+                      shadowColor: "#000",
+                      shadowOpacity: 0.08,
+                      shadowRadius: 10,
+                      shadowOffset: { width: 0, height: 6 },
+                      elevation: 4,
+                    }}
                   >
-                    <MaterialIcons name="favorite" size={18} color="#2E8B6D" />
-                  </TouchableOpacity>
-                </View>
+                    {/* Image */}
+                    <View className="relative">
+                      <Image
+                        source={{ uri: item.imageUrl }}
+                        style={{
+                          width: "100%",
+                          height: 140,
+                          borderTopLeftRadius: 20,
+                          borderTopRightRadius: 20,
+                        }}
+                      />
 
-                {/* Content */}
-                <View className="px-4 py-3">
-                  <Text
-                    className="text-[16px] font-semibold mb-1"
-                    style={{ color: "#1A1A1A" }}
-                  >
-                    {item.name}
-                  </Text>
-
-                  <View className="flex-row items-center mb-2">
-                    <Ionicons name="star" size={14} color="#FACC15" />
-                    <Text className="ml-1 mr-2 text-[13px]" style={{ color: "#1A1A1A" }}>
-                      4.8
-                    </Text>
-
-                    <Text className="text-[13px]" style={{ color: "#6B7280" }}>
-                      1.1 km · Grill · BBQ
-                    </Text>
-                  </View>
-
-                  {/* Footer row */}
-                  <View className="flex-row items-center justify-between">
-                    <View className="flex-row items-center">
-                      <Ionicons name="bicycle" size={16} color="#2E8B6D" />
-                      <Text className="ml-1 text-[13px]" style={{ color: "#2E8B6D" }}>
-                        FREE DELIVERY
-                      </Text>
+                      {/* Favorite */}
+                      <TouchableOpacity
+                        className="absolute top-3 right-3 h-9 w-9 rounded-full items-center justify-center"
+                        style={{ backgroundColor: "#FFFFFF" }}
+                      >
+                        <MaterialIcons
+                          name="favorite"
+                          size={18}
+                          color="#EF4444"
+                        />
+                      </TouchableOpacity>
                     </View>
 
-                    <Text className="text-[14px] font-semibold" style={{ color: "#1A1A1A" }}>
-                      $$
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
+                    {/* Content */}
+                    <View className="px-4 py-3">
+                      <Text
+                        numberOfLines={1}
+                        className="text-[16px] font-semibold mb-1"
+                        style={{ color: "#1A1A1A" }}
+                      >
+                        {item.name}
+                      </Text>
 
+                      {/* Rating */}
+                      <View className="flex-row items-center mb-2">
+                        <Ionicons name="star" size={14} color="#FACC15" />
+                        <Text className="text-[13px] ml-1 mr-2" style={{ color: "#1A1A1A" }}>
+                          4.9
+                        </Text>
+                        <Text className="text-[13px]" style={{ color: "#6B7280" }}>
+                          25–35 min · Italian
+                        </Text>
+                      </View>
+
+                      {/* Chips */}
+                      <View className="flex-row items-center gap-2">
+                        <View
+                          className="flex-row items-center px-2 py-1 rounded-full"
+                          style={{ backgroundColor: "#FFE7DC" }}
+                        >
+                          <Ionicons name="restaurant" size={12} color="#FF6B35" />
+                          <Text className="ml-1 text-[12px]" style={{ color: "#FF6B35" }}>
+                            Meals
+                          </Text>
+                        </View>
+
+                        <View className="flex-row items-center">
+                          <Ionicons name="bicycle" size={14} color="#2E8B6D" />
+                          <Text className="ml-1 text-[12px]" style={{ color: "#2E8B6D" }}>
+                            1.3 km
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                )}
+              />
+            </ScrollView>
+          </View>
+<View className="px-5 py-4">
+  <Text
+    className="text-[20px] font-bold mb-3"
+    style={{ color: "#1A1A1A" }}
+  >
+    Vendors Near You
+  </Text>
+
+<FlatList
+  data={productStore}
+  keyExtractor={(item:any) => item.id}
+  showsVerticalScrollIndicator={false}
+  renderItem={({ item }) => (
+    <TouchableOpacity
+      onPress={() => navigateToSearch(item.name)} // 👈 pass vendor name
+      activeOpacity={0.9}
+      className="mb-5"
+      style={{
+        backgroundColor: "#FFFFFF",
+        borderRadius: 20,
+        shadowColor: "#000",
+        shadowOpacity: 0.08,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 6 },
+        elevation: 4,
+      }}
+    >
+      {/* Vendor Cover Image */}
+      <View className="relative">
+        <Image
+          source={{
+            uri:
+              item.coverImage ||
+              item.products?.[0]?.imageUrl ||
+              "https://via.placeholder.com/400x200",
+          }}
+          style={{
+            width: "100%",
+            height: 180,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+          }}
+        />
+      </View>
+
+      {/* Vendor Info */}
+      <View className="px-4 py-3">
+        <Text
+          className="text-[16px] font-semibold mb-1"
+          style={{ color: "#1A1A1A" }}
+        >
+          {item.name}
+        </Text>
+
+        <View className="flex-row items-center mb-2">
+          <Ionicons name="star" size={14} color="#FACC15" />
+          <Text
+            className="ml-1 mr-2 text-[13px]"
+            style={{ color: "#1A1A1A" }}
+          >
+            4.8
+          </Text>
+
+          <Text
+            className="text-[13px]"
+            style={{ color: "#6B7280" }}
+          >
+            {item.addresses?.[0]} · {item.vendorType}
+          </Text>
+        </View>
+
+        <View className="flex-row items-center justify-between">
+          <Text
+            className="text-[14px] font-semibold"
+            style={{ color: "#1A1A1A" }}
+          >
+            {item.products?.length || 0} items
+          </Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  )}
+/>
+</View>
         </ScrollView>
 
       </View>
       {/* ✅ CART MODAL */}
-         {selectedItem && (
+      {selectedItem && (
         <CartModal
-        name={selectedItem.name}
+          name={selectedItem.name}
           visible={isModalVisible}
           onRequestClose={() => setModalVisible(false)}
           source={selectedItem.imageUrl}

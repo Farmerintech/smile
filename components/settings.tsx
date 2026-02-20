@@ -74,6 +74,12 @@ const {setUser, logout} = useAppStore()
   }
 const Logout = () =>{
 logout();
+setUser({
+  firstName:'',
+  id:'',
+  email:'',
+  isLoggedIn:false
+})
 router.replace("/(auth)/signin")
 }
   return (
